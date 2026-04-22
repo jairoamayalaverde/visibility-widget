@@ -1,0 +1,112 @@
+# Visibility Score Widget
+
+Widget de análisis SEO para captura de leads.
+
+## ⚙️ SETUP INICIAL (IMPORTANTE)
+
+### 1. Configurar el proxy PHP
+
+Este widget necesita un proxy PHP en tu servidor para evitar problemas de CORS.
+
+**Sube `html-proxy-widget.php` a la raíz de tu servidor:**
+```
+https://jairoamaya.co/html-proxy-widget.php
+```
+
+**Verifica que funciona:**
+```
+https://jairoamaya.co/html-proxy-widget.php?url=https://jairoamaya.co
+```
+
+Deberías ver el HTML de tu sitio.
+
+---
+
+## 🚀 Deploy a Vercel
+
+### Opción 1: Deploy desde GitHub (Recomendado)
+
+1. **Crear repo en GitHub:**
+   ```bash
+   git init
+   git add .
+   git commit -m "Initial commit"
+   git branch -M main
+   git remote add origin https://github.com/TU-USUARIO/visibility-widget.git
+   git push -u origin main
+   ```
+
+2. **Conectar en Vercel:**
+   - Ve a https://vercel.com
+   - Click "New Project"
+   - Importa tu repo de GitHub
+   - Deploy automático
+
+3. **URL final:**
+   ```
+   https://visibility-widget.vercel.app
+   ```
+
+### Opción 2: Deploy directo con Vercel CLI
+
+```bash
+# Instalar Vercel CLI
+npm i -g vercel
+
+# Deploy
+vercel
+
+# Deploy a producción
+vercel --prod
+```
+
+## 📦 Estructura del proyecto
+
+```
+/
+├── index.html       # Página principal
+├── widget.js        # Lógica del widget
+├── vercel.json      # Configuración de Vercel
+└── README.md        # Este archivo
+```
+
+## 🔗 Integración en Elementor
+
+Una vez deployado, usa este código en un widget HTML de Elementor:
+
+```html
+<iframe 
+  src="https://TU-URL.vercel.app" 
+  width="100%" 
+  height="2400px" 
+  frameborder="0" 
+  style="border:none; background:#000;"
+  id="visibility-widget"
+></iframe>
+
+<script>
+window.addEventListener('message', function(e) {
+  if (e.data.type === 'visibility-widget-resize') {
+    document.getElementById('visibility-widget').style.height = e.data.height + 'px';
+  }
+});
+</script>
+```
+
+## 🛠️ Desarrollo local
+
+```bash
+# Servidor local simple
+python3 -m http.server 8000
+
+# O con Node.js
+npx http-server -p 8000
+```
+
+Abre http://localhost:8000
+
+## 📝 Notas
+
+- El widget usa el proxy en `jairoamaya.co/html-proxy.php`
+- Los leads se capturan vía console.log (agregar backend después)
+- Auto-resize funciona en iframes
