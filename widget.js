@@ -163,25 +163,31 @@ function renderResultsHero(scoreData) {
 }
 
 function renderImpactMetrics() {
+    const totalFactors = STATE.analysis.length;
+    const passedFactors = STATE.analysis.filter(a => a.status).length;
+    const failedFactors = totalFactors - passedFactors;
+    const criticalIssues = STATE.analysis.filter(a => a.critical && !a.status).length;
+    const potentialGain = STATE.potentialScore - STATE.score;
+    
     return `
         <div class="impact-section">
-            <div class="impact-title">💰 Impacto Estimado en tu Negocio</div>
+            <div class="impact-title">🔍 Hallazgos del Análisis Técnico</div>
             <div class="impact-grid">
                 <div class="impact-card">
-                    <div class="impact-value">-${STATE.impact.traffic}</div>
-                    <div class="impact-label">Visitas/Mes Potenciales</div>
+                    <div class="impact-value" style="color:#10b981;">${passedFactors}/${totalFactors}</div>
+                    <div class="impact-label">Factores Optimizados</div>
                 </div>
                 <div class="impact-card">
-                    <div class="impact-value">-$${STATE.impact.revenue.toLocaleString()}</div>
-                    <div class="impact-label">USD/Mes en Oportunidad</div>
+                    <div class="impact-value">${failedFactors}</div>
+                    <div class="impact-label">Factores Requieren Acción</div>
                 </div>
                 <div class="impact-card">
-                    <div class="impact-value">${STATE.impact.critical}</div>
+                    <div class="impact-value">${criticalIssues}</div>
                     <div class="impact-label">Problemas Críticos</div>
                 </div>
                 <div class="impact-card">
-                    <div class="impact-value">${STATE.impact.gap}%</div>
-                    <div class="impact-label">Brecha vs Potencial</div>
+                    <div class="impact-value" style="color:#10b981;">+${potentialGain}</div>
+                    <div class="impact-label">Ganancia Potencial de Score</div>
                 </div>
             </div>
         </div>
