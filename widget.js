@@ -1,68 +1,239 @@
 // ============================================================
-// VISIBILITY SCORE WIDGET - JAIRO AMAYA
-// Version: 1.0.0
+// LINKEDIN VISIBILITY SCORE WIDGET v2.0
+// Motor con detección de nivel por sensores + pesos dinámicos
+// Formula: VS = 0.30·AT(level) + 0.30·AC + 0.40·CV
 // ============================================================
 
 const CONFIG = {
-    proxyUrl: 'https://jairoamaya.co/html-proxy-widget.php',
-    
-    analysisFactors: {
-        // INFRAESTRUCTURA (20% peso)
-        https: { category: 'infraestructura', weight: 8, critical: true },
-        ttfb: { category: 'infraestructura', weight: 10, critical: true },
-        mobile: { category: 'infraestructura', weight: 8, critical: true },
-        compression: { category: 'infraestructura', weight: 4, critical: false },
-        
-        // ESTRUCTURA SEMÁNTICA (30% peso)
-        title: { category: 'semantica', weight: 9, critical: true },
-        meta_desc: { category: 'semantica', weight: 7, critical: false },
-        h1: { category: 'semantica', weight: 8, critical: true },
-        h2: { category: 'semantica', weight: 4, critical: false },
-        canonical: { category: 'semantica', weight: 6, critical: false },
-        content: { category: 'semantica', weight: 7, critical: false },
-        content_structure: { category: 'semantica', weight: 5, critical: false },
-        alt_text: { category: 'semantica', weight: 5, critical: false },
-        internal_links: { category: 'semantica', weight: 4, critical: false },
-        
-        // DATOS ESTRUCTURADOS (20% peso)
-        schema: { category: 'datos', weight: 10, critical: true },
-        breadcrumbs: { category: 'datos', weight: 5, critical: false },
-        faq_schema: { category: 'datos', weight: 4, critical: false },
-        article_schema: { category: 'datos', weight: 4, critical: false },
-        
-        // SOCIAL/DISTRIBUCIÓN (10% peso)
-        opengraph: { category: 'social', weight: 6, critical: false },
-        twitter_cards: { category: 'social', weight: 3, critical: false },
-        
-        // CITABILIDAD IA (20% peso)
-        llms_txt: { category: 'ia', weight: 10, critical: true },
-        ai_plugin: { category: 'ia', weight: 6, critical: false },
-        semantic_clarity: { category: 'ia', weight: 5, critical: false },
-        
-        // RASTREABILIDAD (10% peso)
-        robots: { category: 'rastreabilidad', weight: 5, critical: true },
-        sitemap: { category: 'rastreabilidad', weight: 5, critical: true },
-        indexability: { category: 'rastreabilidad', weight: 3, critical: false }
+
+    // ── PESOS DINÁMICOS AT POR NIVEL ─────────────────────────
+    // La clave del nuevo motor: los pesos de AT cambian según
+    // el nivel detectado. Alguien en Nivel 1 no es penalizado
+    // por no tener framework (AF=0). En Nivel 4, AF domina.
+    authorityWeights: {
+        1: { pv: 0.70, cl: 0.30, af: 0.00 }, // Foco: claridad básica
+        2: { pv: 0.55, cl: 0.30, af: 0.15 }, // Foco: posicionamiento
+        3: { pv: 0.45, cl: 0.30, af: 0.25 }, // Foco: diferenciación
+        4: { pv: 0.40, cl: 0.25, af: 0.35 }  // Foco: dominio de sistema
     },
-    
-    impactFormulas: {
-        trafficLoss: (score) => Math.round((100 - score) * 30),
-        revenueLoss: (score) => Math.round((100 - score) * 240),
-        criticalIssues: (analysis) => analysis.filter(a => a.critical && !a.status).length,
-        gap: (score) => 100 - score
+
+    dimensionWeights: { AT: 0.30, AC: 0.30, CV: 0.40 },
+
+    // ── SENSORES DE NIVEL ────────────────────────────────────
+    levelSensors: {
+        1: {
+            name: 'EXPLORACIÓN',
+            color: '#6b7280',
+            desc: 'Existes en LinkedIn, pero el sistema no sabe qué hacer contigo.',
+            positiveSignals: [],
+            negativeSignals: ['pv_headline', 'ac_frecuencia', 'pv_about'],
+            threshold: 2
+        },
+        2: {
+            name: 'POSICIONAMIENTO',
+            color: '#f59e0b',
+            desc: 'Ya no eres invisible… pero todavía no eres la opción clara.',
+            positiveSignals: ['cl_nicho', 'ac_frecuencia'],
+            negativeSignals: ['af_framework'],
+            threshold: 2
+        },
+        3: {
+            name: 'DIFERENCIACIÓN',
+            color: '#3b82f6',
+            desc: 'Tienes un sistema propio. Ahora necesitas que domine.',
+            positiveSignals: ['af_framework', 'ac_answer_blocks', 'cv_featured'],
+            negativeSignals: [],
+            threshold: 2
+        },
+        4: {
+            name: 'AUTORIDAD',
+            color: '#10b981',
+            desc: 'El sistema te reconoce. Eres la opción obvia en tu categoría.',
+            positiveSignals: ['af_framework', 'af_recomendaciones', 'cv_oferta', 'cv_social_proof', 'cl_nicho'],
+            negativeSignals: [],
+            threshold: 4
+        }
+    },
+
+    // ── TRIGGERS ESPECIALES ──────────────────────────────────
+    triggers: {
+        efectoGeneralista: {
+            condition: (level, scores) => level === 2 && scores.AF < 20,
+            penalty: 22,
+            id: 'efecto_generalista',
+            title: 'Efecto Generalista detectado',
+            message: 'Estás diciendo varias cosas correctas… pero ninguna domina lo suficiente. No es falta de valor, es falta de jerarquía.'
+        }
+    },
+
+    // ── FACTORES DEL QUIZ ────────────────────────────────────
+    factors: {
+        // AUTORIDAD — Pilar PV
+        pv_headline: {
+            dimension: 'AT', pillar: 'PV', weight: 20, critical: true,
+            label: 'Headline orientado a resultado',
+            question: '¿Tu headline comunica el resultado que generas, no solo tu cargo?',
+            hint: 'Ej: "Ayudo a consultores a conseguir clientes con LinkedIn" vs "Consultor de Marketing"',
+            sensor_for: [1]
+        },
+        pv_about: {
+            dimension: 'AT', pillar: 'PV', weight: 18, critical: true,
+            label: 'About como propuesta de valor',
+            question: '¿Tu About habla de a quién ayudas y qué logran contigo?',
+            hint: 'Estructura ideal: Problema → Solución → Tu método → CTA',
+            sensor_for: [1]
+        },
+        pv_resultado: {
+            dimension: 'AT', pillar: 'PV', weight: 14, critical: false,
+            label: 'Resultados cuantificables',
+            question: '¿Mencionas resultados concretos (números, % o impacto) en tu experiencia?',
+            hint: 'Ej: "Generé 3x más leads en 6 meses para 12 clientes del sector salud"'
+        },
+        // AUTORIDAD — Pilar CL
+        cl_nicho: {
+            dimension: 'AT', pillar: 'CL', weight: 14, critical: true,
+            label: 'Nicho dominante claro',
+            question: '¿Tu perfil deja claro a quién sirves específicamente?',
+            hint: 'Nicho = sector + tipo de persona + problema concreto',
+            sensor_for: [2, 4]
+        },
+        cl_consistencia: {
+            dimension: 'AT', pillar: 'CL', weight: 12, critical: false,
+            label: 'Consistencia de mensaje',
+            question: '¿Headline, About y experiencia dicen lo mismo sobre tu propuesta?',
+            hint: 'Si alguien lee solo tu headline y luego tu About, ¿recibe el mismo mensaje?'
+        },
+        // AUTORIDAD — Pilar AF
+        af_framework: {
+            dimension: 'AT', pillar: 'AF', weight: 16, critical: false,
+            label: 'Metodología o framework propio',
+            question: '¿Tienes un sistema, método o framework con nombre propio?',
+            hint: 'Ej: "Método VISTA", "Sistema 3C". No importa si es simple, importa que tenga nombre.',
+            sensor_for: [2, 3, 4]
+        },
+        af_recomendaciones: {
+            dimension: 'AT', pillar: 'AF', weight: 10, critical: false,
+            label: 'Recomendaciones que validan tu método',
+            question: '¿Tus recomendaciones mencionan resultados específicos o tu metodología?',
+            hint: 'No basta con "gran profesional". Busca: "Gracias a su método X, logramos Y"',
+            sensor_for: [4]
+        },
+        // ALCANCE
+        ac_frecuencia: {
+            dimension: 'AC', pillar: 'AC', weight: 16, critical: true,
+            label: 'Frecuencia de publicación',
+            question: '¿Publicas contenido en LinkedIn al menos 1 vez por semana?',
+            hint: 'Consistencia > viralidad. El algoritmo premia la regularidad.',
+            sensor_for: [1, 2]
+        },
+        ac_formato: {
+            dimension: 'AC', pillar: 'AC', weight: 10, critical: false,
+            label: 'Variedad de formatos',
+            question: '¿Usas múltiples formatos? (texto, carruseles, video, documentos)',
+            hint: 'Los carruseles y documentos tienen mayor alcance orgánico.'
+        },
+        ac_engagement: {
+            dimension: 'AC', pillar: 'AC', weight: 12, critical: false,
+            label: 'Engagement real',
+            question: '¿Tus publicaciones generan comentarios y conversaciones?',
+            hint: 'Los comentarios valen 4× más que los likes en el algoritmo de LinkedIn.'
+        },
+        ac_answer_blocks: {
+            dimension: 'AC', pillar: 'AC', weight: 14, critical: true,
+            label: 'Contenido tipo "Answer Block"',
+            question: '¿Tu contenido responde preguntas específicas que busca tu audiencia?',
+            hint: 'Ej: "¿Cómo consigo clientes con LinkedIn?" — respuesta directa, sin rodeos.',
+            sensor_for: [3]
+        },
+        ac_hashtags: {
+            dimension: 'AC', pillar: 'AC', weight: 6, critical: false,
+            label: 'Hashtags de nicho específicos',
+            question: '¿Usas 2-5 hashtags específicos de tu sector (no genéricos)?',
+            hint: 'Evita #marketing #negocios. Prefiere #SEOparaEcommerce #ConsultoríaB2B.'
+        },
+        // CONVERSIÓN
+        cv_cta: {
+            dimension: 'CV', pillar: 'CV', weight: 20, critical: true,
+            label: 'CTA claro en el About',
+            question: '¿Tu About termina con un llamado a la acción con siguiente paso claro?',
+            hint: 'Ej: "¿Quieres saber tu score? Escríbeme DM con la palabra SCORE"'
+        },
+        cv_oferta: {
+            dimension: 'CV', pillar: 'CV', weight: 18, critical: true,
+            label: 'Oferta explícita y contrateable',
+            question: '¿Está claro qué pueden contratar contigo y cómo empezar?',
+            hint: 'Tu perfil debe responder: "¿Qué haces, para quién y cómo te contrato?"',
+            sensor_for: [4]
+        },
+        cv_featured: {
+            dimension: 'CV', pillar: 'CV', weight: 12, critical: false,
+            label: 'Sección Destacados activa',
+            question: '¿Usas Destacados con activos propios (PDF, web, caso de éxito)?',
+            hint: 'Es tu vitrina principal. Un lead magnet aquí puede duplicar conversión.',
+            sensor_for: [3]
+        },
+        cv_contacto: {
+            dimension: 'CV', pillar: 'CV', weight: 8, critical: false,
+            label: 'Datos de contacto accesibles',
+            question: '¿Tu email, web o calendario están visibles en tu perfil?',
+            hint: 'Activa Creator Mode para añadir un botón de contacto personalizado.'
+        },
+        cv_social_proof: {
+            dimension: 'CV', pillar: 'CV', weight: 10, critical: false,
+            label: 'Prueba social visible',
+            question: '¿Hay casos de éxito o validaciones externas fáciles de ver?',
+            hint: 'Formato: situación inicial → acción → resultado medible.',
+            sensor_for: [4]
+        }
+    },
+
+    actions: {
+        pv_headline:       'Reescribe: "[Verbo resultado] + [nicho] + [sin que]". Ej: "Multiplico clientes para consultores B2B sin depender de referidos"',
+        pv_about:          'Reestructura en 4 bloques: (1) Problema de tu cliente, (2) Por qué ocurre, (3) Cómo lo resuelves, (4) CTA concreto',
+        pv_resultado:      'Añade a tus 3 últimas experiencias una métrica real. Aunque sea pequeña.',
+        cl_nicho:          'Escribe esta frase y ponla en tu headline: "Ayudo a [tipo de persona] a [resultado] sin [objeción principal]"',
+        cl_consistencia:   'Lee headline → About → primera experiencia. Si el mensaje cambia, tienes inconsistencia. Unifica.',
+        af_framework:      'Dale nombre a lo que ya haces. Si tienes un proceso, llámalo "Método [Nombre]" o "Sistema [Inicial]"',
+        af_recomendaciones:'Contacta a 3 clientes y pide que mencionen un resultado específico y tu método en su recomendación',
+        ac_frecuencia:     'Bloquea cada lunes 45 minutos para publicar. Una publicación consistente vale más que diez esporádicas',
+        ac_formato:        'Esta semana: convierte tu mejor texto en un carrusel de 5-7 slides. Máximo alcance orgánico.',
+        ac_engagement:     'Termina cada post con una pregunta que tenga respuesta de una palabra. Reduce la fricción al comentar.',
+        ac_answer_blocks:  'Escribe un post que empiece: "La pregunta que más me hacen sobre [tu tema] es..." y respóndela directamente',
+        ac_hashtags:       'Usa exactamente 3 hashtags: 1 muy específico de nicho, 1 intermedio, 1 amplio. Nunca más de 5.',
+        cv_cta:            'Última línea del About: "Si quieres [resultado concreto], escríbeme DM con la palabra [PALABRA]"',
+        cv_oferta:         'Añade en Servicios o en About: qué ofreces, para quién, y la siguiente acción para contratarte',
+        cv_featured:       'Fija en Destacados: un PDF de valor gratuito, tu web, y tu mejor caso de éxito (en ese orden)',
+        cv_contacto:       'Activa Creator Mode → añade enlace → pon tu Calendly o email directo',
+        cv_social_proof:   'Solicita 1 testimonio en formato: "Antes tenía X. Con [Tu nombre] logramos Y en Z tiempo"'
     }
 };
 
+// ============================================================
+// STATE
+// ============================================================
+
 const STATE = {
     view: 'input',
-    domain: '',
-    analysis: [],
-    score: 0,
-    impact: {},
+    profileUrl: '',
+    currentQuestion: 0,
+    answers: {},
+    allFactors: [],
+    detectedLevel: null,
+    scores: { AT: 0, AC: 0, CV: 0, VS: 0, PV: 0, CL: 0, AF: 0, VS_base: 0 },
+    triggersActivated: [],
     interventions: [],
-    potentialScore: 100,
-    progress: 0
+    potentialScore: 0,
+    nextLevelGap: [],
+    errorMessage: ''
 };
+
+// ============================================================
+// BOOT
+// ============================================================
+
+function initFactors() {
+    STATE.allFactors = Object.entries(CONFIG.factors).map(([id, f]) => ({ id, ...f }));
+}
 
 // ============================================================
 // RENDER ENGINE
@@ -70,787 +241,580 @@ const STATE = {
 
 function render() {
     const app = document.getElementById('app');
-    
-    switch(STATE.view) {
-        case 'input':
-            app.innerHTML = renderInput();
-            attachInputListeners();
-            break;
-        case 'analyzing':
-            app.innerHTML = renderAnalyzing();
-            break;
-        case 'results':
-            app.innerHTML = renderResults();
-            attachResultsListeners();
-            break;
-        case 'success':
-            app.innerHTML = renderSuccess();
-            break;
-        case 'error':
-            app.innerHTML = renderError();
-            attachErrorListeners();
-            break;
+    switch (STATE.view) {
+        case 'input':     app.innerHTML = renderInput();     attachInputListeners();   break;
+        case 'quiz':      app.innerHTML = renderQuiz();      attachQuizListeners();    break;
+        case 'analyzing': app.innerHTML = renderAnalyzing(); break;
+        case 'results':   app.innerHTML = renderResults();   attachResultsListeners(); break;
+        case 'success':   app.innerHTML = renderSuccess();   break;
+        case 'error':     app.innerHTML = renderError();     attachErrorListeners();   break;
     }
+    notifyParentHeight();
 }
+
+// ── INPUT ────────────────────────────────────────────────────
 
 function renderInput() {
     return `
         <div class="input-box">
-            <label>Ingresa tu dominio</label>
-            <input 
-                type="text" 
-                id="domain-input"
-                placeholder="tudominio.com"
-                value="${STATE.domain}"
-            />
-            <button class="analyze-btn" id="analyze-btn">
-                Analizar mi sitio ahora
-            </button>
-        </div>
-    `;
-}
-
-function renderAnalyzing() {
-    const progressSteps = [
-        'Conectando con el sitio...',
-        'Analizando estructura HTML...',
-        'Validando datos estructurados...',
-        'Evaluando infraestructura técnica...',
-        'Calculando score de visibilidad...'
-    ];
-    
-    const currentStep = Math.floor((STATE.progress / 100) * progressSteps.length);
-    const stepText = progressSteps[Math.min(currentStep, progressSteps.length - 1)];
-    
-    return `
-        <div class="loading-state">
-            <div class="spinner"></div>
-            <div class="loading-text">${stepText}</div>
-            <div class="loading-domain">${STATE.domain}</div>
-            <div class="loading-progress">
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: ${STATE.progress}%"></div>
-                </div>
-                <div class="progress-label">${STATE.progress}% completado</div>
+            <div class="input-icon">⚡</div>
+            <label>Tu perfil de LinkedIn</label>
+            <input type="text" id="profile-input"
+                placeholder="linkedin.com/in/tu-perfil"
+                value="${STATE.profileUrl}" autocomplete="off" />
+            <p class="input-hint">
+                17 factores · 4 niveles de madurez · ~3 minutos<br>
+                El motor detecta tu nivel antes de calcular tu score.
+            </p>
+            <button class="analyze-btn" id="analyze-btn">Analizar mi visibilidad ahora</button>
+            <div class="trust-row">
+                <span>🔒 Sin acceso a tu cuenta</span>
+                <span>·</span>
+                <span>Motor determinístico</span>
+                <span>·</span>
+                <span>Pesos dinámicos por nivel</span>
             </div>
         </div>
     `;
 }
 
-function renderResults() {
-    const scoreData = getScoreLevel(STATE.score);
-    
+function attachInputListeners() {
+    document.getElementById('profile-input').addEventListener('keypress', e => { if (e.key === 'Enter') startQuiz(); });
+    document.getElementById('analyze-btn').addEventListener('click', startQuiz);
+}
+
+function startQuiz() {
+    let url = document.getElementById('profile-input').value.trim();
+    if (!url) { showInputError('Ingresa tu URL de LinkedIn'); return; }
+    if (!url.includes('linkedin')) url = 'linkedin.com/in/' + url.replace(/^@/, '');
+    STATE.profileUrl = url;
+    STATE.currentQuestion = 0;
+    STATE.answers = {};
+    STATE.view = 'quiz';
+    render();
+}
+
+function showInputError(msg) {
+    document.querySelector('.input-error')?.remove();
+    const err = document.createElement('p');
+    err.className = 'input-error';
+    err.textContent = msg;
+    document.getElementById('profile-input').after(err);
+}
+
+// ── QUIZ ─────────────────────────────────────────────────────
+
+function renderQuiz() {
+    const factor = STATE.allFactors[STATE.currentQuestion];
+    const total = STATE.allFactors.length;
+    const progress = Math.round((STATE.currentQuestion / total) * 100);
+    const dimColors = { AT: '#7c3aed', AC: '#0891b2', CV: '#dc2626' };
+    const dimLabels = { AT: 'Autoridad', AC: 'Alcance', CV: 'Conversión' };
+    const pillarNames = { PV: 'Propuesta de valor', CL: 'Posicionamiento', AF: 'Aceleradores', AC: 'Alcance', CV: 'Conversión' };
+
     return `
-        ${renderResultsHero(scoreData)}
-        ${renderImpactMetrics()}
-        ${renderAnalysisGrid()}
+        <div class="quiz-container">
+            <div class="quiz-progress">
+                <div class="quiz-progress-track">
+                    <div class="quiz-progress-fill" style="width:${progress}%"></div>
+                </div>
+                <div class="quiz-progress-label">
+                    <span>${STATE.currentQuestion + 1} / ${total}</span>
+                    <span>${total - STATE.currentQuestion} restantes</span>
+                </div>
+            </div>
+            <div class="quiz-meta">
+                <span class="dimension-badge" style="color:${dimColors[factor.dimension]};border-color:${dimColors[factor.dimension]}44;background:${dimColors[factor.dimension]}11">
+                    ${dimLabels[factor.dimension]}
+                </span>
+                <span class="pillar-label">${pillarNames[factor.pillar]} · ${factor.weight}pts</span>
+                ${factor.critical ? '<span class="critical-badge">CRÍTICO</span>' : ''}
+            </div>
+            <div class="quiz-question">
+                <div class="question-number">P${STATE.currentQuestion + 1}</div>
+                <h2>${factor.label}</h2>
+                <p class="question-detail">${factor.question}</p>
+                ${factor.hint ? `<p class="question-hint">💡 ${factor.hint}</p>` : ''}
+            </div>
+            <div class="quiz-answers">
+                <button class="answer-btn answer-yes" data-answer="true">
+                    <span class="answer-icon">✓</span>
+                    <span class="answer-text">Sí, lo tengo</span>
+                </button>
+                <button class="answer-btn answer-no" data-answer="false">
+                    <span class="answer-icon">✗</span>
+                    <span class="answer-text">No / Parcialmente</span>
+                </button>
+            </div>
+            <div class="quiz-profile-ref">Analizando: <span>${STATE.profileUrl}</span></div>
+        </div>
+    `;
+}
+
+function attachQuizListeners() {
+    document.querySelectorAll('.answer-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const answer = btn.dataset.answer === 'true';
+            STATE.answers[STATE.allFactors[STATE.currentQuestion].id] = answer;
+            btn.classList.add('selected');
+            setTimeout(() => {
+                STATE.currentQuestion++;
+                if (STATE.currentQuestion >= STATE.allFactors.length) {
+                    STATE.view = 'analyzing';
+                    render();
+                    setTimeout(runScoring, 600);
+                } else {
+                    render();
+                }
+            }, 220);
+        });
+    });
+}
+
+// ── ANALYZING ────────────────────────────────────────────────
+
+function renderAnalyzing() {
+    const steps = [
+        'Detectando nivel de madurez...',
+        'Aplicando pesos dinámicos AT...',
+        'Calculando Alcance (AC)...',
+        'Calculando Conversión (CV)...',
+        'Evaluando triggers de ajuste...',
+        'Generando plan de intervención...'
+    ];
+    return `
+        <div class="loading-state">
+            <div class="spinner"></div>
+            <div class="loading-text" id="loading-text">${steps[0]}</div>
+            <div class="loading-domain">${STATE.profileUrl}</div>
+            <div class="loading-steps">
+                ${steps.map((s, i) => `
+                    <div class="loading-step" id="step-${i}">
+                        <span class="step-dot"></span><span>${s}</span>
+                    </div>`).join('')}
+            </div>
+        </div>
+    `;
+}
+
+async function runScoring() {
+    const stepTexts = [
+        'Detectando nivel de madurez...',
+        'Aplicando pesos dinámicos AT...',
+        'Calculando Alcance (AC)...',
+        'Calculando Conversión (CV)...',
+        'Evaluando triggers de ajuste...',
+        'Generando plan de intervención...'
+    ];
+    for (let i = 0; i < stepTexts.length; i++) {
+        const txt = document.getElementById('loading-text');
+        const step = document.getElementById(`step-${i}`);
+        if (txt) txt.textContent = stepTexts[i];
+        if (step) step.classList.add('active');
+        await delay(380);
+        if (i === 0) STATE.detectedLevel = detectLevel();
+        if (i === 1) calculateScores();
+        if (i === 4) evaluateTriggers();
+        if (i === 5) {
+            STATE.interventions = generateInterventions();
+            STATE.potentialScore = calculatePotentialScore();
+            STATE.nextLevelGap = getNextLevelGap();
+        }
+        if (step) step.classList.add('done');
+    }
+    await delay(250);
+    STATE.view = 'results';
+    render();
+}
+
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ============================================================
+// MOTOR DE SCORING v2
+// ============================================================
+
+function detectLevel() {
+    // Intentar clasificar desde el nivel más alto al más bajo
+    for (let lvl = 4; lvl >= 1; lvl--) {
+        const sensor = CONFIG.levelSensors[lvl];
+        if (sensor.positiveSignals.length === 0) {
+            // Nivel 1: se detecta por ausencia
+            const negCount = sensor.negativeSignals.filter(id => !STATE.answers[id]).length;
+            if (negCount >= sensor.threshold) return lvl;
+        } else {
+            // Niveles 2-4: se detectan por presencia
+            const posCount = sensor.positiveSignals.filter(id => STATE.answers[id]).length;
+            if (posCount >= sensor.threshold) return lvl;
+        }
+    }
+    return 1;
+}
+
+function calculateScores() {
+    const level = STATE.detectedLevel;
+    const w = CONFIG.authorityWeights[level];
+
+    const pvFactors = STATE.allFactors.filter(f => f.dimension === 'AT' && f.pillar === 'PV');
+    const clFactors = STATE.allFactors.filter(f => f.dimension === 'AT' && f.pillar === 'CL');
+    const afFactors = STATE.allFactors.filter(f => f.dimension === 'AT' && f.pillar === 'AF');
+
+    const PV = rawScore(pvFactors);
+    const CL = rawScore(clFactors);
+    const AF = rawScore(afFactors);
+    const AT = Math.round(PV * w.pv + CL * w.cl + AF * w.af);
+
+    const AC = Math.round(rawScore(STATE.allFactors.filter(f => f.dimension === 'AC')));
+    const CV = Math.round(rawScore(STATE.allFactors.filter(f => f.dimension === 'CV')));
+    const VS_base = Math.round(AT * 0.30 + AC * 0.30 + CV * 0.40);
+
+    STATE.scores = { AT, AC, CV, VS: VS_base, PV: Math.round(PV), CL: Math.round(CL), AF: Math.round(AF), VS_base };
+}
+
+function rawScore(factors) {
+    if (!factors.length) return 0;
+    let total = 0, achieved = 0;
+    factors.forEach(f => { total += f.weight; if (STATE.answers[f.id]) achieved += f.weight; });
+    return total > 0 ? (achieved / total) * 100 : 0;
+}
+
+function evaluateTriggers() {
+    STATE.triggersActivated = [];
+    Object.entries(CONFIG.triggers).forEach(([key, trigger]) => {
+        if (trigger.condition(STATE.detectedLevel, STATE.scores)) {
+            STATE.triggersActivated.push({ key, ...trigger });
+            STATE.scores.VS = Math.max(0, STATE.scores.VS - trigger.penalty);
+        }
+    });
+}
+
+function generateInterventions() {
+    const dimW = { CV: 0.40, AT: 0.30, AC: 0.30 };
+    const w = CONFIG.authorityWeights[STATE.detectedLevel];
+    return STATE.allFactors
+        .filter(f => !STATE.answers[f.id])
+        .map(f => {
+            const pillarMult = f.dimension === 'AT'
+                ? (f.pillar === 'PV' ? w.pv : f.pillar === 'CL' ? w.cl : w.af)
+                : 1;
+            return { ...f, impact: Math.round(f.weight * dimW[f.dimension] * pillarMult * 3.5) };
+        })
+        .sort((a, b) => {
+            if (a.critical && !b.critical) return -1;
+            if (!a.critical && b.critical) return 1;
+            return b.impact - a.impact;
+        })
+        .slice(0, 5)
+        .map(f => ({
+            id: f.id, label: f.label, dimension: f.dimension,
+            pillar: f.pillar, critical: f.critical, impact: f.impact,
+            action: CONFIG.actions[f.id] || 'Optimizar este factor en tu perfil'
+        }));
+}
+
+function calculatePotentialScore() {
+    const triggerRecovery = STATE.triggersActivated.reduce((s, t) => s + t.penalty, 0);
+    const gain = STATE.interventions.reduce((s, t) => s + t.impact, 0);
+    return Math.min(STATE.scores.VS + triggerRecovery + gain, 100);
+}
+
+function getNextLevelGap() {
+    if (STATE.detectedLevel >= 4) return [];
+    const nextSensor = CONFIG.levelSensors[STATE.detectedLevel + 1];
+    return nextSensor.positiveSignals
+        .filter(id => !STATE.answers[id])
+        .map(id => ({ id, label: CONFIG.factors[id]?.label || id, action: CONFIG.actions[id] || '' }));
+}
+
+// ============================================================
+// RENDER RESULTS
+// ============================================================
+
+function renderResults() {
+    return `
+        ${renderResultsHero()}
+        ${STATE.triggersActivated.length ? renderTriggers() : ''}
+        ${renderDimensionBreakdown()}
+        ${renderNextLevelGap()}
+        ${renderInterventions()}
         ${renderLeadCapture()}
     `;
 }
 
-function renderResultsHero(scoreData) {
+function renderResultsHero() {
+    const { VS, AT, AC, CV } = STATE.scores;
+    const level = STATE.detectedLevel;
+    const m = CONFIG.levelSensors[level];
+    const passCount = Object.values(STATE.answers).filter(Boolean).length;
+    const failCount = STATE.allFactors.length - passCount;
+
     return `
         <div class="results-hero">
-            <div class="score-label-top">VISIBILITY SCORE SEO</div>
-            <div class="score-value-hero">
-                <span class="number">${STATE.score}</span><span class="max">/100</span>
-                <span class="indicator ${scoreData.class}"></span>
-            </div>
-            <div class="score-status ${scoreData.class}">${scoreData.label}</div>
-            <div class="score-domain">${STATE.domain}</div>
-        </div>
-    `;
-}
-
-function renderImpactMetrics() {
-    const totalFactors = STATE.analysis.length;
-    const passedFactors = STATE.analysis.filter(a => a.status).length;
-    const failedFactors = totalFactors - passedFactors;
-    const criticalIssues = STATE.analysis.filter(a => a.critical && !a.status).length;
-    const potentialGain = STATE.potentialScore - STATE.score;
-    
-    return `
-        <div class="impact-section">
-            <div class="impact-title">🔍 Hallazgos del Análisis Técnico</div>
-            <div class="impact-grid">
-                <div class="impact-card">
-                    <div class="impact-value" style="color:#10b981;">${passedFactors}/${totalFactors}</div>
-                    <div class="impact-label">Factores Optimizados</div>
-                </div>
-                <div class="impact-card">
-                    <div class="impact-value">${failedFactors}</div>
-                    <div class="impact-label">Factores Requieren Acción</div>
-                </div>
-                <div class="impact-card">
-                    <div class="impact-value">${criticalIssues}</div>
-                    <div class="impact-label">Problemas Críticos</div>
-                </div>
-                <div class="impact-card">
-                    <div class="impact-value" style="color:#10b981;">+${potentialGain}</div>
-                    <div class="impact-label">Ganancia Potencial de Score</div>
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-function renderAnalysisGrid() {
-    return `
-        <div class="analysis-grid">
-            ${renderEvidencePanel()}
-            ${renderPlanPanel()}
-        </div>
-    `;
-}
-
-function renderEvidencePanel() {
-    const keyEvidence = STATE.analysis.slice(0, 6);
-    
-    return `
-        <div class="evidence-panel">
-            <div class="panel-title">Evidencia Técnica Detectada</div>
-            ${keyEvidence.map(item => `
-                <div class="evidence-item">
-                    <div>
-                        <div class="evidence-name">${item.label}</div>
-                        <div class="evidence-value ${item.status ? 'good' : item.critical ? 'critical' : 'warning'}">
-                            ${item.displayValue}
-                        </div>
+            <div class="results-hero-grid">
+                <div class="hero-score-col">
+                    <div class="score-label-top">VISIBILITY SCORE</div>
+                    <div class="score-display">
+                        <span class="score-number">${VS}</span>
+                        <span class="score-max">/100</span>
+                    </div>
+                    <div class="maturity-badge" style="border-color:${m.color};color:${m.color};background:${m.color}18">
+                        NIVEL ${level} · ${m.name}
+                    </div>
+                    <p class="maturity-desc">${m.desc}</p>
+                    <div class="level-dots">
+                        ${[1,2,3,4].map(l => `
+                            <div class="level-dot ${l <= level ? 'active' : ''}" style="${l <= level ? `background:${m.color};border-color:${m.color}` : ''}">
+                                <span>${l}</span>
+                            </div>`).join('')}
                     </div>
                 </div>
-            `).join('')}
+                <div class="hero-stats-col">
+                    <div class="mini-stat-row">
+                        <div class="mini-stat">
+                            <div class="mini-stat-value good">${passCount}</div>
+                            <div class="mini-stat-label">Factores OK</div>
+                        </div>
+                        <div class="mini-stat">
+                            <div class="mini-stat-value bad">${failCount}</div>
+                            <div class="mini-stat-label">A mejorar</div>
+                        </div>
+                    </div>
+                    <div class="dimension-mini-bars">
+                        ${miniBar('Autoridad', AT, '#7c3aed')}
+                        ${miniBar('Alcance',   AC, '#0891b2')}
+                        ${miniBar('Conversión',CV, '#dc2626')}
+                    </div>
+                    <div class="potential-row">
+                        <div class="potential-label">Score potencial</div>
+                        <div class="potential-value">${STATE.potentialScore}<span>/100</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="profile-tag">${STATE.profileUrl}</div>
         </div>
     `;
 }
 
-function renderPlanPanel() {
-    const topInterventions = STATE.interventions.slice(0, 3);
-    
+function miniBar(label, score, color) {
     return `
-        <div class="plan-panel">
-            <div class="panel-title">Plan de Intervención</div>
-            ${topInterventions.map(task => `
-                <div class="task-item">
-                    <div class="task-checkbox"></div>
-                    <div class="task-text">${task.description}</div>
-                    <div class="task-impact">+${task.impact}</div>
-                </div>
-            `).join('')}
-            
-            <div class="potential-score">
-                <div class="potential-label">Score Potencial</div>
-                <div class="potential-value">${STATE.potentialScore}</div>
+        <div class="mini-bar-row">
+            <span class="mini-bar-label">${label}</span>
+            <div class="mini-bar-track">
+                <div class="mini-bar-fill" style="width:${score}%;background:${color}"></div>
             </div>
-        </div>
-    `;
+            <span class="mini-bar-val" style="color:${color}">${score}</span>
+        </div>`;
+}
+
+function renderTriggers() {
+    return STATE.triggersActivated.map(t => `
+        <div class="trigger-alert">
+            <div class="trigger-header">
+                <span class="trigger-icon">⚠</span>
+                <span class="trigger-title">${t.title}</span>
+                <span class="trigger-penalty">−${t.penalty} pts</span>
+            </div>
+            <p class="trigger-message">${t.message}</p>
+        </div>`).join('');
+}
+
+function renderDimensionBreakdown() {
+    const { AT, AC, CV, PV, CL, AF } = STATE.scores;
+    const level = STATE.detectedLevel;
+    const w = CONFIG.authorityWeights[level];
+
+    return `
+        <div class="breakdown-section">
+            <div class="breakdown-header">
+                <h3 class="section-title">Desglose del modelo</h3>
+                <span class="breakdown-level-note">Pesos AT · Nivel ${level}: PV×${w.pv} · CL×${w.cl} · AF×${w.af}</span>
+            </div>
+            <div class="breakdown-grid">
+                ${dimCard('AT','Autoridad', AT,'#7c3aed','30%',[
+                    {name:`PV · Prop. valor ×${w.pv}`, score:PV},
+                    {name:`CL · Posición ×${w.cl}`,    score:CL},
+                    {name:`AF · Framework ×${w.af}`,   score:AF}
+                ])}
+                ${dimCard('AC','Alcance',   AC,'#0891b2','30%',[])}
+                ${dimCard('CV','Conversión',CV,'#dc2626','40%',[])}
+            </div>
+        </div>`;
+}
+
+function dimCard(key, name, score, color, vsWeight, subpillars) {
+    const passed = STATE.allFactors.filter(f => f.dimension === key && STATE.answers[f.id]).length;
+    const total  = STATE.allFactors.filter(f => f.dimension === key).length;
+    const statusLabel = score >= 75 ? 'Sólido' : score >= 50 ? 'Mejorable' : 'Crítico';
+    const statusColor = score >= 75 ? '#10b981' : score >= 50 ? '#f59e0b' : '#ef4444';
+
+    return `
+        <div class="dim-card" style="--dim-color:${color}">
+            <div class="dim-header">
+                <span class="dim-key">${key}</span>
+                <span class="dim-name">${name}</span>
+                <span class="dim-weight">${vsWeight}</span>
+            </div>
+            <div class="dim-score-big">${score}</div>
+            <div class="dim-bar-track">
+                <div class="dim-bar-fill" style="width:${score}%;background:${color}"></div>
+            </div>
+            <div class="dim-meta">
+                <span style="color:${statusColor}">${statusLabel}</span>
+                <span>${passed}/${total} OK</span>
+            </div>
+            ${subpillars.length ? `
+                <div class="dim-subpillars">
+                    ${subpillars.map(sp => `
+                        <div class="subpillar-row">
+                            <span class="sp-name">${sp.name}</span>
+                            <div class="sp-bar-track">
+                                <div class="sp-bar-fill" style="width:${sp.score}%;background:${color}55"></div>
+                            </div>
+                            <span class="sp-score">${sp.score}</span>
+                        </div>`).join('')}
+                </div>` : ''}
+        </div>`;
+}
+
+function renderNextLevelGap() {
+    const level = STATE.detectedLevel;
+    if (level >= 4 || !STATE.nextLevelGap.length) return '';
+    const nextM = CONFIG.levelSensors[level + 1];
+
+    return `
+        <div class="gap-section">
+            <div class="gap-header">
+                <h3 class="section-title">Para subir a Nivel ${level + 1} · ${nextM.name}</h3>
+                <p class="gap-desc">Señales que el sistema todavía no detecta en tu perfil:</p>
+            </div>
+            <div class="gap-list">
+                ${STATE.nextLevelGap.map(g => `
+                    <div class="gap-item">
+                        <span class="gap-dot" style="background:${nextM.color}"></span>
+                        <div>
+                            <div class="gap-label">${g.label}</div>
+                            <div class="gap-action">${g.action}</div>
+                        </div>
+                    </div>`).join('')}
+            </div>
+        </div>`;
+}
+
+function renderInterventions() {
+    const dimLabels = { AT:'Autoridad', AC:'Alcance', CV:'Conversión' };
+    const dimColors = { AT:'#7c3aed', AC:'#0891b2', CV:'#dc2626' };
+
+    return `
+        <div class="interventions-section">
+            <div class="interventions-header">
+                <h3 class="section-title">Plan de intervención</h3>
+                <div class="interventions-meta">Potencial: <strong>${STATE.potentialScore}/100</strong></div>
+            </div>
+            <div class="interventions-list">
+                ${STATE.interventions.map((t, i) => `
+                    <div class="intervention-item ${t.critical ? 'is-critical' : ''}">
+                        <div class="intervention-num">${String(i+1).padStart(2,'0')}</div>
+                        <div class="intervention-body">
+                            <div class="intervention-top">
+                                <span class="int-dim-badge" style="color:${dimColors[t.dimension]};border-color:${dimColors[t.dimension]}44">${dimLabels[t.dimension]}</span>
+                                ${t.critical ? '<span class="int-critical-badge">CRÍTICO</span>' : ''}
+                                <span class="int-impact">+${t.impact} pts</span>
+                            </div>
+                            <div class="intervention-label">${t.label}</div>
+                            <div class="intervention-action">${t.action}</div>
+                        </div>
+                    </div>`).join('')}
+            </div>
+        </div>`;
 }
 
 function renderLeadCapture() {
+    const level = STATE.detectedLevel;
     return `
         <div class="lead-capture">
-            <h2>📊 Reporte Completo + Plan SOSTAC</h2>
-            <p>Recibe el análisis detallado de los 30+ factores evaluados más tu roadmap ejecutable de 6 semanas</p>
-            
-            <ul>
-                <li>Diagnóstico técnico completo en PDF</li>
-                <li>Plan SOSTAC personalizado (6 semanas)</li>
-                <li>Estimado de impacto por tarea</li>
-                <li>Priorización según ROI técnico</li>
+            <div class="lead-badge">REPORTE COMPLETO</div>
+            <h2>Recibe tu diagnóstico detallado</h2>
+            <p>Los 17 factores evaluados + roadmap para pasar de Nivel ${level} a Nivel ${Math.min(level+1,4)}</p>
+            <ul class="lead-list">
+                <li>Reporte PDF con puntuación factor por factor</li>
+                <li>Plan de acción semana a semana</li>
+                <li>Plantillas de headline, About y CTA</li>
+                <li>Fórmula de contenido para Answer Blocks</li>
             </ul>
-            
             <form class="lead-form" id="lead-form">
                 <div class="form-row">
-                    <input type="text" id="name-input" placeholder="Tu nombre" required />
+                    <input type="text"  id="name-input"  placeholder="Tu nombre" required />
                     <input type="email" id="email-input" placeholder="tu@email.com" required />
                 </div>
-                <button type="submit" class="submit-btn">
-                    Enviar Reporte Completo
-                </button>
-                <div class="privacy-note">
-                    🔒 Tu información está protegida. No spam, solo valor.
-                </div>
+                <button type="submit" class="submit-btn">Enviar mi reporte gratuito</button>
+                <div class="privacy-note">🔒 Sin spam. Solo tu diagnóstico y plan de acción.</div>
             </form>
-        </div>
-    `;
+        </div>`;
+}
+
+function attachResultsListeners() {
+    document.getElementById('lead-form')?.addEventListener('submit', handleLeadSubmit);
 }
 
 function renderSuccess() {
     return `
         <div class="success-message">
             <div class="success-icon">✓</div>
-            <h2>¡Reporte Enviado!</h2>
-            <p>Revisa tu email en los próximos 5 minutos. Te enviamos tu diagnóstico completo + plan SOSTAC ejecutable.</p>
-            <p style="margin-top: 24px; color: #666;">
-                ¿No lo ves? Revisa spam/promociones.
-            </p>
-        </div>
-    `;
+            <h2>¡Reporte en camino!</h2>
+            <p>Revisa tu bandeja en los próximos minutos.</p>
+            <p class="success-hint">¿No lo ves? Revisa spam o promociones.</p>
+        </div>`;
 }
 
 function renderError() {
     return `
         <div class="error-message">
-            <h3>⚠️ Error en el Análisis</h3>
-            <p style="color:#999;margin-top:12px;">
-                ${STATE.errorMessage || 'No se pudo analizar el sitio. Verifica el dominio e intenta nuevamente.'}
-            </p>
+            <h3>⚠ Algo salió mal</h3>
+            <p>${STATE.errorMessage || 'Error inesperado. Intenta de nuevo.'}</p>
             <button class="retry-btn" id="retry-btn">Reintentar</button>
-        </div>
-    `;
-}
-
-// ============================================================
-// EVENT LISTENERS
-// ============================================================
-
-function attachInputListeners() {
-    const input = document.getElementById('domain-input');
-    const btn = document.getElementById('analyze-btn');
-
-    input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') startAnalysis();
-    });
-
-    btn.addEventListener('click', startAnalysis);
-}
-
-function attachResultsListeners() {
-    const form = document.getElementById('lead-form');
-    
-    if (form) {
-        form.addEventListener('submit', handleLeadSubmit);
-    }
+        </div>`;
 }
 
 function attachErrorListeners() {
-    const retryBtn = document.getElementById('retry-btn');
-    if (retryBtn) {
-        retryBtn.addEventListener('click', () => {
-            STATE.view = 'input';
-            render();
-        });
-    }
+    document.getElementById('retry-btn')?.addEventListener('click', () => { STATE.view = 'input'; render(); });
 }
-
-// ============================================================
-// ANÁLISIS CORE
-// ============================================================
-
-async function startAnalysis() {
-    const input = document.getElementById('domain-input');
-    let domain = input.value.trim();
-
-    if (!domain) {
-        alert('Por favor ingresa un dominio');
-        return;
-    }
-
-    domain = domain.replace(/^https?:\/\//, '').replace(/\/$/, '');
-    STATE.domain = domain;
-    STATE.view = 'analyzing';
-    STATE.progress = 0;
-    render();
-
-    try {
-        await runAnalysis(domain);
-        STATE.view = 'results';
-        render();
-    } catch (error) {
-        console.error('Error:', error);
-        STATE.errorMessage = error.message;
-        STATE.view = 'error';
-        render();
-    }
-}
-
-async function runAnalysis(domain) {
-    updateProgress(10);
-    
-    const targetUrl = `https://${domain}`;
-    const response = await fetch(`${CONFIG.proxyUrl}?url=${encodeURIComponent(targetUrl)}`);
-    
-    updateProgress(30);
-    
-    if (!response.ok) {
-        throw new Error(`No se pudo conectar con ${domain}`);
-    }
-
-    const html = await response.text();
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-
-    updateProgress(50);
-
-    const rawResults = await executeAllAnalysis(doc, domain);
-    
-    updateProgress(70);
-    
-    STATE.analysis = processResults(rawResults);
-    STATE.score = calculateScore(STATE.analysis);
-    STATE.impact = calculateImpact(STATE.score, STATE.analysis);
-    STATE.interventions = generateInterventions(STATE.analysis);
-    STATE.potentialScore = calculatePotentialScore(STATE.score, STATE.interventions);
-    
-    updateProgress(100);
-}
-
-function updateProgress(value) {
-    STATE.progress = value;
-    if (STATE.view === 'analyzing') {
-        render();
-    }
-}
-
-async function executeAllAnalysis(doc, domain) {
-    return {
-        https: analyzeHTTPS(domain),
-        ttfb: analyzeTTFB(),
-        mobile: analyzeMobile(doc),
-        compression: { status: true, value: 'Detectado', label: 'Compresión' },
-        
-        title: analyzeTitle(doc),
-        meta_desc: analyzeMetaDesc(doc),
-        h1: analyzeH1(doc),
-        h2: analyzeH2(doc),
-        canonical: analyzeCanonical(doc, domain),
-        content: analyzeContent(doc),
-        content_structure: analyzeContentStructure(doc),
-        alt_text: analyzeAltText(doc),
-        internal_links: analyzeInternalLinks(doc),
-        
-        schema: analyzeSchema(doc),
-        breadcrumbs: analyzeBreadcrumbs(doc),
-        faq_schema: analyzeFAQSchema(doc),
-        article_schema: analyzeArticleSchema(doc),
-        
-        opengraph: analyzeOpenGraph(doc),
-        twitter_cards: analyzeTwitterCards(doc),
-        
-        llms_txt: { status: false, value: 'No detectado', label: 'llms.txt' },
-        ai_plugin: { status: false, value: 'No detectado', label: 'AI Plugin' },
-        semantic_clarity: analyzeSemanticClarity(doc),
-        
-        robots: { status: true, value: 'Requiere verificación', label: 'Robots.txt' },
-        sitemap: { status: true, value: 'Requiere verificación', label: 'Sitemap XML' },
-        indexability: analyzeIndexability(doc)
-    };
-}
-
-// ============================================================
-// FUNCIONES DE ANÁLISIS INDIVIDUAL
-// ============================================================
-
-function analyzeHTTPS(domain) {
-    return { status: true, value: 'Seguro', label: 'HTTPS', displayValue: 'Seguro' };
-}
-
-function analyzeTTFB() {
-    const ttfb = (Math.random() * 2 + 0.5).toFixed(2);
-    return { 
-        status: parseFloat(ttfb) < 1.5, 
-        value: `${ttfb}s`,
-        label: 'TTFB',
-        displayValue: `${ttfb}s`
-    };
-}
-
-function analyzeMobile(doc) {
-    const viewport = doc.querySelector('meta[name="viewport"]');
-    return { 
-        status: !!viewport, 
-        value: viewport ? 'Configurado' : 'No configurado',
-        label: 'Mobile-Friendly',
-        displayValue: viewport ? 'Configurado' : 'No configurado'
-    };
-}
-
-function analyzeTitle(doc) {
-    const title = doc.querySelector('title');
-    const text = title ? title.textContent.trim() : '';
-    const length = text.length;
-    return {
-        status: length >= 30 && length <= 60,
-        value: length,
-        label: 'Título SEO',
-        displayValue: `${length} caracteres`,
-        critical: true
-    };
-}
-
-function analyzeMetaDesc(doc) {
-    const meta = doc.querySelector('meta[name="description"]');
-    const content = meta ? meta.getAttribute('content').trim() : '';
-    const length = content.length;
-    return {
-        status: length >= 120 && length <= 160,
-        value: length,
-        label: 'Meta Description',
-        displayValue: `${length} caracteres`
-    };
-}
-
-function analyzeH1(doc) {
-    const h1s = doc.querySelectorAll('h1');
-    const count = h1s.length;
-    return {
-        status: count === 1,
-        value: count,
-        label: 'H1',
-        displayValue: count === 1 ? '1 H1' : `${count} H1 detectados`,
-        critical: true
-    };
-}
-
-function analyzeH2(doc) {
-    const h2s = doc.querySelectorAll('h2');
-    const count = h2s.length;
-    return {
-        status: count >= 2,
-        value: count,
-        label: 'H2',
-        displayValue: `${count} H2`
-    };
-}
-
-function analyzeCanonical(doc, domain) {
-    const canonical = doc.querySelector('link[rel="canonical"]');
-    const href = canonical ? canonical.getAttribute('href') : '';
-    return {
-        status: href.includes(domain),
-        value: href ? 'Presente' : 'Ausente',
-        label: 'Canonical',
-        displayValue: href ? 'Configurado' : 'No configurado'
-    };
-}
-
-function analyzeContent(doc) {
-    const body = doc.body ? doc.body.textContent : '';
-    const words = body.trim().split(/\s+/).length;
-    return {
-        status: words >= 300,
-        value: words,
-        label: 'Contenido',
-        displayValue: `${words} palabras`
-    };
-}
-
-function analyzeContentStructure(doc) {
-    const paragraphs = doc.querySelectorAll('p');
-    const lists = doc.querySelectorAll('ul, ol');
-    return {
-        status: paragraphs.length >= 5 && lists.length >= 1,
-        value: `${paragraphs.length} párrafos`,
-        label: 'Estructura',
-        displayValue: `${paragraphs.length} párrafos, ${lists.length} listas`
-    };
-}
-
-function analyzeAltText(doc) {
-    const images = doc.querySelectorAll('img');
-    const withAlt = Array.from(images).filter(img => img.hasAttribute('alt') && img.getAttribute('alt').trim()).length;
-    const percentage = images.length > 0 ? Math.round((withAlt / images.length) * 100) : 0;
-    return {
-        status: percentage >= 80,
-        value: percentage,
-        label: 'Alt Text',
-        displayValue: `${percentage}%`
-    };
-}
-
-function analyzeInternalLinks(doc) {
-    const links = doc.querySelectorAll('a[href]');
-    const internal = Array.from(links).filter(link => {
-        const href = link.getAttribute('href');
-        return href && (href.startsWith('/') || href.includes(window.location.hostname));
-    }).length;
-    return {
-        status: internal >= 10,
-        value: internal,
-        label: 'Enlaces Internos',
-        displayValue: `${internal} enlaces`
-    };
-}
-
-function analyzeSchema(doc) {
-    const scripts = Array.from(doc.querySelectorAll('script[type="application/ld+json"]'));
-    const count = scripts.length;
-    
-    const types = scripts.map(script => {
-        try {
-            const json = JSON.parse(script.textContent);
-            return json['@type'] || 'Unknown';
-        } catch {
-            return 'Invalid';
-        }
-    }).filter(t => t !== 'Invalid');
-    
-    return {
-        status: count >= 2,
-        value: count,
-        label: 'Schema.org',
-        displayValue: types.length > 0 ? types.join(', ') : `${count} schemas`,
-        critical: true
-    };
-}
-
-function analyzeBreadcrumbs(doc) {
-    const hasBC = Array.from(doc.querySelectorAll('script[type="application/ld+json"]'))
-        .some(script => {
-            try {
-                const json = JSON.parse(script.textContent);
-                return json['@type'] === 'BreadcrumbList';
-            } catch { return false; }
-        });
-    return {
-        status: hasBC,
-        value: hasBC ? 'Presente' : 'Ausente',
-        label: 'Breadcrumbs Schema',
-        displayValue: hasBC ? 'Configurado' : 'No configurado'
-    };
-}
-
-function analyzeFAQSchema(doc) {
-    const hasFAQ = Array.from(doc.querySelectorAll('script[type="application/ld+json"]'))
-        .some(script => {
-            try {
-                const json = JSON.parse(script.textContent);
-                return json['@type'] === 'FAQPage';
-            } catch { return false; }
-        });
-    return {
-        status: hasFAQ,
-        value: hasFAQ ? 'Presente' : 'Ausente',
-        label: 'FAQ Schema',
-        displayValue: hasFAQ ? 'Configurado' : 'No configurado'
-    };
-}
-
-function analyzeArticleSchema(doc) {
-    const hasArticle = Array.from(doc.querySelectorAll('script[type="application/ld+json"]'))
-        .some(script => {
-            try {
-                const json = JSON.parse(script.textContent);
-                return json['@type'] === 'Article' || json['@type'] === 'BlogPosting';
-            } catch { return false; }
-        });
-    return {
-        status: hasArticle,
-        value: hasArticle ? 'Presente' : 'Ausente',
-        label: 'Article Schema',
-        displayValue: hasArticle ? 'Configurado' : 'No configurado'
-    };
-}
-
-function analyzeOpenGraph(doc) {
-    const ogTags = ['og:title', 'og:description', 'og:image', 'og:url'];
-    const present = ogTags.filter(tag => doc.querySelector(`meta[property="${tag}"]`)).length;
-    return {
-        status: present >= 3,
-        value: present,
-        label: 'Open Graph',
-        displayValue: `${present}/4 tags`
-    };
-}
-
-function analyzeTwitterCards(doc) {
-    const twitterTags = ['twitter:card', 'twitter:title', 'twitter:description'];
-    const present = twitterTags.filter(tag => doc.querySelector(`meta[name="${tag}"]`)).length;
-    return {
-        status: present >= 2,
-        value: present,
-        label: 'Twitter Cards',
-        displayValue: `${present}/3 tags`
-    };
-}
-
-function analyzeSemanticClarity(doc) {
-    const hasArticle = doc.querySelector('article');
-    const hasMain = doc.querySelector('main');
-    const hasNav = doc.querySelector('nav');
-    const score = [hasArticle, hasMain, hasNav].filter(Boolean).length;
-    return {
-        status: score >= 2,
-        value: score,
-        label: 'Claridad Semántica',
-        displayValue: `${score}/3 elementos HTML5`
-    };
-}
-
-function analyzeIndexability(doc) {
-    const robots = doc.querySelector('meta[name="robots"]');
-    const content = robots ? robots.getAttribute('content') : '';
-    const noindex = content.includes('noindex');
-    return {
-        status: !noindex,
-        value: noindex ? 'Bloqueado' : 'Permitido',
-        label: 'Indexabilidad',
-        displayValue: noindex ? 'NOINDEX detectado' : 'Indexable'
-    };
-}
-
-// ============================================================
-// PROCESAMIENTO DE RESULTADOS
-// ============================================================
-
-function processResults(rawResults) {
-    const processed = [];
-    
-    Object.keys(rawResults).forEach(key => {
-        const result = rawResults[key];
-        const config = CONFIG.analysisFactors[key];
-        
-        if (config) {
-            processed.push({
-                id: key,
-                label: result.label || key,
-                status: result.status,
-                value: result.value,
-                displayValue: result.displayValue || result.value,
-                weight: config.weight,
-                critical: config.critical,
-                category: config.category
-            });
-        }
-    });
-    
-    return processed;
-}
-
-function calculateScore(analysis) {
-    let totalWeight = 0;
-    let achievedWeight = 0;
-
-    analysis.forEach(item => {
-        totalWeight += item.weight;
-        if (item.status) {
-            achievedWeight += item.weight;
-        }
-    });
-
-    return totalWeight > 0 ? Math.round((achievedWeight / totalWeight) * 100) : 0;
-}
-
-function calculateImpact(score, analysis) {
-    return {
-        traffic: CONFIG.impactFormulas.trafficLoss(score),
-        revenue: CONFIG.impactFormulas.revenueLoss(score),
-        critical: CONFIG.impactFormulas.criticalIssues(analysis),
-        gap: CONFIG.impactFormulas.gap(score)
-    };
-}
-
-function generateInterventions(analysis) {
-    const failed = analysis
-        .filter(item => !item.status)
-        .sort((a, b) => {
-            if (a.critical && !b.critical) return -1;
-            if (!a.critical && b.critical) return 1;
-            return b.weight - a.weight;
-        });
-
-    const interventionMap = {
-        h1: { description: 'Consolidar múltiples H1 en jerarquía correcta', impact: 13 },
-        schema: { description: 'Implementar Schema.org completo (Website, Person, Article)', impact: 20 },
-        ttfb: { description: 'Optimizar TTFB < 1.5s (CDN + caché)', impact: 15 },
-        title: { description: 'Ajustar Title tags a rango óptimo (30-60 caracteres)', impact: 12 },
-        alt_text: { description: 'Agregar ALT text descriptivo a imágenes faltantes', impact: 8 },
-        llms_txt: { description: 'Crear llms.txt en /.well-known/', impact: 18 },
-        breadcrumbs: { description: 'Implementar Breadcrumbs Schema', impact: 7 },
-        opengraph: { description: 'Completar tags Open Graph (4/4)', impact: 9 },
-        canonical: { description: 'Configurar URLs canónicas correctamente', impact: 10 }
-    };
-
-    return failed
-        .filter(item => interventionMap[item.id])
-        .map(item => ({
-            id: item.id,
-            description: interventionMap[item.id].description,
-            impact: interventionMap[item.id].impact
-        }))
-        .slice(0, 5);
-}
-
-function calculatePotentialScore(currentScore, interventions) {
-    const potentialGain = interventions.reduce((sum, task) => sum + task.impact, 0);
-    return Math.min(currentScore + potentialGain, 100);
-}
-
-function getScoreLevel(score) {
-    if (score >= 85) {
-        return {
-            class: 'good',
-            label: 'EXCELENTE',
-            message: 'Tu sitio tiene una base técnica sólida'
-        };
-    } else if (score >= 70) {
-        return {
-            class: 'warning',
-            label: 'MEJORABLE',
-            message: 'Tienes oportunidades significativas de optimización'
-        };
-    } else {
-        return {
-            class: 'critical',
-            label: 'CRÍTICO',
-            message: 'Tu sitio tiene problemas severos bloqueando tu visibilidad'
-        };
-    }
-}
-
-// ============================================================
-// LEAD CAPTURE
-// ============================================================
 
 async function handleLeadSubmit(e) {
     e.preventDefault();
-    
-    const name = document.getElementById('name-input').value.trim();
+    const name  = document.getElementById('name-input').value.trim();
     const email = document.getElementById('email-input').value.trim();
-
-    if (!name || !email) {
-        alert('Por favor completa todos los campos');
-        return;
-    }
+    if (!name || !email) { alert('Completa todos los campos'); return; }
 
     const leadData = {
-        name,
-        email,
-        domain: STATE.domain,
-        score: STATE.score,
-        analysis: STATE.analysis,
+        name, email,
+        profileUrl: STATE.profileUrl,
+        detectedLevel: STATE.detectedLevel,
+        scores: STATE.scores,
+        triggersActivated: STATE.triggersActivated.map(t => t.key),
+        answers: STATE.answers,
         interventions: STATE.interventions,
-        impact: STATE.impact,
+        potentialScore: STATE.potentialScore,
         timestamp: new Date().toISOString()
     };
 
     console.log('Lead capturado:', leadData);
-
-    // TODO: Enviar a backend
-    // await fetch('/api/leads', {
-    //     method: 'POST',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify(leadData)
-    // });
+    // TODO: await fetch('/api/leads', { method:'POST', ... body: JSON.stringify(leadData) });
 
     if (typeof gtag !== 'undefined') {
-        gtag('event', 'generate_lead', {
-            event_category: 'Lead',
-            event_label: 'SEO Report',
-            value: STATE.score
-        });
+        gtag('event', 'generate_lead', { event_category: 'Lead', event_label: 'LinkedIn Visibility v2', value: STATE.scores.VS });
     }
 
     STATE.view = 'success';
     render();
 }
 
-// ============================================================
-// INIT
-// ============================================================
+function notifyParentHeight() {
+    if (window.parent !== window) {
+        window.parent.postMessage({ type: 'linkedin-visibility-resize', height: document.body.scrollHeight }, '*');
+    }
+}
 
-console.log('✅ Widget cargado correctamente');
-
-// Esperar a que el DOM esté listo
+// ── BOOT ─────────────────────────────────────────────────────
+initFactors();
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', render);
 } else {
