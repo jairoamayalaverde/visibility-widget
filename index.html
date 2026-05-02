@@ -583,6 +583,217 @@
             margin-top: 12px;
         }
 
+        /* ── INSTRUCTIONS SCREEN (VISUAL/INTERACTIVE) ─── */
+        .instructions-screen {
+            background: var(--bg2);
+            border: 1px solid var(--border2);
+            border-radius: 16px;
+            padding: 44px 36px;
+            text-align: center;
+            max-width: 620px;
+            margin: 0 auto;
+        }
+
+        .inst-header {
+            margin-bottom: 32px;
+        }
+
+        .inst-icon {
+            font-size: 42px;
+            margin-bottom: 16px;
+        }
+
+        .inst-title {
+            font-family: var(--font-display);
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .inst-subtitle {
+            font-size: 15px;
+            color: var(--muted);
+        }
+
+        .inst-demo-box {
+            background: var(--bg3);
+            border: 2px solid var(--border2);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 28px;
+        }
+
+        .inst-demo-label {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--cyan);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .inst-demo-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .inst-demo-btn {
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid var(--border2);
+            background: var(--bg);
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: var(--font-body);
+            font-size: 15px;
+            font-weight: 500;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .inst-demo-btn-icon {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .inst-demo-btn:hover {
+            border-color: var(--cyan);
+            transform: translateY(-2px);
+        }
+
+        .inst-demo-btn.yes-btn {
+            border-color: var(--border2);
+        }
+
+        .inst-demo-btn.yes-btn:hover,
+        .inst-demo-btn.yes-btn.clicked {
+            border-color: var(--green);
+            background: rgba(16,185,129,0.08);
+            box-shadow: 0 4px 20px rgba(16,185,129,0.15);
+        }
+
+        .inst-demo-btn.yes-btn .inst-demo-btn-icon {
+            color: var(--green);
+        }
+
+        .inst-demo-btn.no-btn {
+            border-color: var(--border2);
+        }
+
+        .inst-demo-btn.no-btn:hover,
+        .inst-demo-btn.no-btn.clicked {
+            border-color: var(--rose);
+            background: rgba(244,63,94,0.08);
+            box-shadow: 0 4px 20px rgba(244,63,94,0.15);
+        }
+
+        .inst-demo-btn.no-btn .inst-demo-btn-icon {
+            color: var(--rose);
+        }
+
+        .inst-demo-hint {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--muted2);
+            margin-top: 8px;
+        }
+
+        .inst-checklist {
+            text-align: left;
+            margin-bottom: 32px;
+        }
+
+        .inst-check-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        .inst-check-icon {
+            color: var(--green);
+            font-size: 16px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .inst-example-box {
+            background: var(--bg);
+            border: 1px solid var(--border2);
+            border-left: 3px solid var(--cyan);
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 28px;
+            text-align: left;
+        }
+
+        .inst-example-label {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--cyan);
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+
+        .inst-example-text {
+            font-size: 13px;
+            color: var(--muted);
+            font-style: italic;
+            line-height: 1.5;
+        }
+
+        .inst-start-btn {
+            width: 100%;
+            background: var(--cyan);
+            color: var(--bg);
+            border: none;
+            padding: 18px 32px;
+            border-radius: 8px;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .inst-start-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .inst-start-btn:not(:disabled):hover {
+            background: #33ddff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,212,255,0.3);
+        }
+
+        .inst-start-btn.ready {
+            animation: pulse-ready 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-ready {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(0,212,255,0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(0,212,255,0); }
+        }
+
+        .inst-progress-hint {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--muted2);
+            margin-top: 12px;
+        }
+
         /* ── QUIZ ──────────────────────────────────────── */
         .quiz-container {
             background: var(--bg2);
@@ -1115,17 +1326,79 @@
             font-family: var(--font-mono);
         }
 
-        .lc-social-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: var(--green);
-            animation: pulse-dot-lc 2s ease-in-out infinite;
+        .lc-cta-box {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 24px;
+            text-align: center;
         }
 
-        @keyframes pulse-dot-lc {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(0.8); }
+        .lc-cta-intro {
+            font-size: 15px;
+            color: var(--muted);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .lc-cta-intro strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .lc-whatsapp-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            padding: 18px 32px;
+            border-radius: 10px;
+            border: none;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--bg);
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            margin-bottom: 16px;
+        }
+
+        .lc-whatsapp-btn:hover {
+            filter: brightness(1.15);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+        }
+
+        .lc-wa-icon {
+            font-size: 24px;
+        }
+
+        .lc-wa-text {
+            letter-spacing: 0.3px;
+        }
+
+        .lc-cta-meta {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--muted2);
+        }
+
+        .lc-cta-meta strong {
+            font-weight: 600;
+        }
+
+        .lc-trust {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--muted2);
+            font-family: var(--font-mono);
+            flex-wrap: wrap;
         }
 
         /* ── SUCCESS MEJORADO ──────────────────────────── */
@@ -1458,7 +1731,8 @@ const STATE = {
     interventions: [],
     potentialScore: 0,
     nextLevelGap: [],
-    errorMessage: ''
+    errorMessage: '',
+    demoClicked: false
 };
 
 function initFactors() {
@@ -1468,13 +1742,14 @@ function initFactors() {
 function render() {
     const app = document.getElementById('app');
     switch (STATE.view) {
-        case 'input':      app.innerHTML = renderInput();      attachInputListeners();   break;
-        case 'onboarding': app.innerHTML = renderOnboarding(); runOnboarding();          break;
-        case 'quiz':       app.innerHTML = renderQuiz();       attachQuizListeners();    break;
-        case 'analyzing':  app.innerHTML = renderAnalyzing();  break;
-        case 'results':    app.innerHTML = renderResults();    attachResultsListeners(); break;
-        case 'success':    app.innerHTML = renderSuccess();    break;
-        case 'error':      app.innerHTML = renderError();      attachErrorListeners();   break;
+        case 'input':        app.innerHTML = renderInput();        attachInputListeners();        break;
+        case 'onboarding':   app.innerHTML = renderOnboarding();   runOnboarding();               break;
+        case 'instructions': app.innerHTML = renderInstructions(); attachInstructionsListeners(); break;
+        case 'quiz':         app.innerHTML = renderQuiz();         attachQuizListeners();         break;
+        case 'analyzing':    app.innerHTML = renderAnalyzing();    break;
+        case 'results':      app.innerHTML = renderResults();      attachResultsListeners();      break;
+        case 'success':      app.innerHTML = renderSuccess();      break;
+        case 'error':        app.innerHTML = renderError();        attachErrorListeners();        break;
     }
     notifyParentHeight();
 }
@@ -1566,8 +1841,89 @@ async function runOnboarding() {
     await delay(1000);
     document.getElementById('ob-step-3')?.classList.add('done');
     await delay(600);
-    STATE.view = 'quiz';
+    STATE.view = 'instructions';
     render();
+}
+
+function renderInstructions() {
+    return `
+        <div class="instructions-screen">
+            <div class="inst-header">
+                <div class="inst-icon">🎯</div>
+                <h2 class="inst-title">Diagnóstico de 17 factores</h2>
+                <p class="inst-subtitle">Cada respuesta ajusta tu score final</p>
+            </div>
+
+            <div class="inst-demo-box">
+                <div class="inst-demo-label">Así funcionan las preguntas</div>
+                <div class="inst-demo-buttons">
+                    <button class="inst-demo-btn yes-btn" id="demo-yes">
+                        <span class="inst-demo-btn-icon">✓</span>
+                        <span>Sí, lo tengo</span>
+                    </button>
+                    <button class="inst-demo-btn no-btn" id="demo-no">
+                        <span class="inst-demo-btn-icon">✗</span>
+                        <span>No / Parcialmente</span>
+                    </button>
+                </div>
+                <div class="inst-demo-hint" id="demo-hint">
+                    ${STATE.demoClicked ? '✓ Perfecto. Ahora hazlo con las 17 preguntas reales.' : 'Prueba hacer click en cualquiera ↑'}
+                </div>
+            </div>
+
+            <div class="inst-checklist">
+                <div class="inst-check-item">
+                    <span class="inst-check-icon">✓</span>
+                    <span><strong>Responde con honestidad</strong> — el motor se adapta a tu nivel real</span>
+                </div>
+                <div class="inst-check-item">
+                    <span class="inst-check-icon">✓</span>
+                    <span><strong>No hay trampa</strong> — cada nivel tiene pesos diferentes</span>
+                </div>
+                <div class="inst-check-item">
+                    <span class="inst-check-icon">✓</span>
+                    <span><strong>Toma 3 minutos</strong> — 17 preguntas = 17 clicks</span>
+                </div>
+            </div>
+
+            <div class="inst-example-box">
+                <div class="inst-example-label">EJEMPLO DE PREGUNTA</div>
+                <div class="inst-example-text">
+                    "¿Tu headline dice QUÉ LOGRAN las personas que trabajan contigo?"
+                </div>
+            </div>
+
+            <button class="inst-start-btn ${STATE.demoClicked ? 'ready' : ''}" id="start-quiz-btn" ${!STATE.demoClicked ? 'disabled' : ''}>
+                ${STATE.demoClicked ? 'Empezar diagnóstico real →' : 'Primero prueba los botones de arriba'}
+            </button>
+            
+            ${STATE.demoClicked ? '<p class="inst-progress-hint">17 preguntas · ~3 minutos · Score al final</p>' : ''}
+        </div>
+    `;
+}
+
+function attachInstructionsListeners() {
+    const demoYes = document.getElementById('demo-yes');
+    const demoNo = document.getElementById('demo-no');
+    const startBtn = document.getElementById('start-quiz-btn');
+
+    const handleDemoClick = (btn) => {
+        btn.classList.add('clicked');
+        if (!STATE.demoClicked) {
+            STATE.demoClicked = true;
+            setTimeout(() => render(), 400);
+        }
+    };
+
+    demoYes?.addEventListener('click', () => handleDemoClick(demoYes));
+    demoNo?.addEventListener('click', () => handleDemoClick(demoNo));
+
+    startBtn?.addEventListener('click', () => {
+        if (STATE.demoClicked) {
+            STATE.view = 'quiz';
+            render();
+        }
+    });
 }
 
 function renderQuiz() {
@@ -1956,50 +2312,26 @@ const LEAD_CONTENT = {
     1: {
         urgency:   'Tu perfil está en modo invisible.',
         headline:  'El sistema no sabe qué hacer contigo todavía.',
-        sub:       'Lo primero no es más contenido. Es estructura. Recibe el diagnóstico completo con el plan exacto para que el algoritmo empiece a trabajar a tu favor.',
-        cta:       'Quiero salir de la invisibilidad',
-        items: [
-            'Diagnóstico de los 17 factores con score individual',
-            'Plantilla de headline orientado a resultado (lista para copiar)',
-            'Estructura de About en 4 bloques con ejemplos de tu sector',
-            'Checklist de activación: 7 cambios en 7 días'
-        ]
+        sub:       'Arriba ves algunas mejoras detectadas por el motor. Pero hay mucho más que optimizar. Un perfil bien estructurado puede multiplicar tu visibilidad x10.',
+        cta:       'Quiero que optimices mi perfil completo'
     },
     2: {
         urgency:   'Estás cerca. Pero "cerca" no convierte.',
         headline:  'Tu perfil informa. Aún no vende.',
-        sub:       'Tienes nicho y actividad. Lo que falta es jerarquía. Recibe el plan para consolidar tu mensaje en una sola promesa que domine.',
-        cta:       'Quiero que mi perfil empiece a vender',
-        items: [
-            'Diagnóstico completo + detección del Efecto Generalista',
-            'Framework para nombrar y estructurar tu metodología propia',
-            'Plantilla de About con Answer Block integrado',
-            'Plan de contenido de 4 semanas para construir autoridad'
-        ]
+        sub:       'Las mejoras que ves arriba son solo el inicio. Un perfil optimizado profesionalmente convierte visitantes en oportunidades reales.',
+        cta:       'Quiero que optimices mi perfil completo'
     },
     3: {
         urgency:   'Tu sistema existe. Pocos lo ven todavía.',
         headline:  'Tienes diferenciación. Falta dominancia.',
-        sub:       'Ya tienes framework y estructura. El siguiente paso es que tu nombre se convierta en sinónimo de tu categoría. Recibe el roadmap para el salto al Nivel 4.',
-        cta:       'Quiero dominar mi categoría',
-        items: [
-            'Diagnóstico de brechas entre Nivel 3 y Nivel 4',
-            'Estrategia de Answer Blocks para ser citado por la IA',
-            'Sistema de prueba social: cómo solicitar recomendaciones que validen tu método',
-            'Auditoría de la sección Destacados como landing page'
-        ]
+        sub:       'Estás en el nivel donde pequeños ajustes generan grandes resultados. Las optimizaciones que ves arriba son las obvias — hay detalles estratégicos que solo un experto detecta.',
+        cta:       'Quiero que optimices mi perfil completo'
     },
     4: {
         urgency:   'Nivel 4 alcanzado. Hora de sistematizar.',
         headline:  'Eres la opción obvia. Ahora escálalo.',
-        sub:       'Estás en el percentil superior. Recibe el análisis de los puntos donde aún hay margen de optimización y la estrategia para mantener la autoridad.',
-        cta:       'Quiero el análisis de optimización',
-        items: [
-            'Reporte completo con benchmarks de Nivel 4',
-            'Identificación de gaps residuales en AT, AC y CV',
-            'Estrategia de contenido para mantener dominio de categoría',
-            'Protocolo de actualización trimestral del perfil'
-        ]
+        sub:       'Estás en el percentil superior. Las mejoras que ves arriba son los últimos puntos de optimización para mantener tu autoridad y escalar tu presencia.',
+        cta:       'Quiero que optimices mi perfil completo'
     }
 };
 
@@ -2014,51 +2346,47 @@ function renderLeadCapture() {
         ? 'Ninguna de tus promesas domina todavía.'
         : content.headline;
     const sub = hasGeneralista
-        ? 'El diagnóstico detectó el Efecto Generalista en tu perfil. Recibe el plan exacto para eliminar el ruido y hacer que una sola promesa gane.'
+        ? 'El diagnóstico detectó el Efecto Generalista en tu perfil. Las mejoras que ves arriba son solo el comienzo — necesitas una estrategia completa para consolidar tu mensaje.'
         : content.sub;
-    const cta = hasGeneralista
-        ? 'Quiero eliminar el Efecto Generalista'
-        : content.cta;
+
+    // Mensaje pre-rellenado para WhatsApp
+    const whatsappMessage = encodeURIComponent(
+        `Hola Jairo, acabo de completar el LinkedIn Visibility Score.\n\n` +
+        `Mi perfil: ${STATE.profileUrl}\n` +
+        `Mi score: ${VS}/100 (Nivel ${level} - ${m.name})\n\n` +
+        `Quiero que optimices mi perfil de LinkedIn.`
+    );
+    const whatsappUrl = `https://wa.me/573012963640?text=${whatsappMessage}`;
 
     return `
         <div class="lead-capture">
             <div class="lc-urgency" style="border-color:${m.color}33;color:${m.color}">
                 ${content.urgency}
             </div>
+
             <div class="lc-header">
                 <h2 class="lc-headline">${headline}</h2>
                 <p class="lc-sub">${sub}</p>
             </div>
-            <div class="lc-preview">
-                <div class="lc-preview-score">
-                    <span class="lc-preview-num" style="color:${m.color}">${VS}</span>
-                    <div class="lc-preview-meta">
-                        <span class="lc-preview-label">Tu score actual</span>
-                        <span class="lc-preview-potential">Potencial: ${STATE.potentialScore}/100</span>
-                    </div>
+
+            <div class="lc-cta-box">
+                <div class="lc-cta-intro">
+                    Estas son solo <strong>algunas mejoras</strong> que puedes hacer en tu perfil.
                 </div>
-                <div class="lc-preview-arrow">→</div>
-                <div class="lc-preview-items">
-                    ${content.items.map(item => `
-                        <div class="lc-item">
-                            <span class="lc-item-check" style="color:${m.color}">✓</span>
-                            <span>${item}</span>
-                        </div>`).join('')}
+                <a href="${whatsappUrl}" target="_blank" class="lc-whatsapp-btn" style="background:${m.color}">
+                    <span class="lc-wa-icon">💬</span>
+                    <span class="lc-wa-text">${content.cta}</span>
+                </a>
+                <div class="lc-cta-meta">
+                    Tu score actual: <strong style="color:${m.color}">${VS}/100</strong> · 
+                    Potencial: <strong style="color:var(--green)">${STATE.potentialScore}/100</strong>
                 </div>
             </div>
-            <form class="lead-form" id="lead-form">
-                <div class="form-row">
-                    <input type="text"  id="name-input"  placeholder="Tu nombre" required />
-                    <input type="email" id="email-input" placeholder="tu@email.com" required />
-                </div>
-                <button type="submit" class="submit-btn lc-btn" style="background:${m.color}">
-                    ${cta}
-                </button>
-                <div class="privacy-note">🔒 Sin spam. Solo tu diagnóstico y plan de acción personalizado.</div>
-            </form>
-            <div class="lc-social">
-                <span class="lc-social-dot"></span>
-                <span>Diagnóstico enviado en menos de 5 minutos</span>
+
+            <div class="lc-trust">
+                <span>✓ Respuesta en menos de 1 hora</span>
+                <span>·</span>
+                <span>✓ Análisis personalizado incluido</span>
             </div>
         </div>`;
 }
@@ -2099,39 +2427,11 @@ function renderError() {
 }
 
 function attachResultsListeners() {
-    document.getElementById('lead-form')?.addEventListener('submit', handleLeadSubmit);
+    // No hay formulario - WhatsApp link directo
 }
 
 function attachErrorListeners() {
     document.getElementById('retry-btn')?.addEventListener('click', () => { STATE.view = 'input'; render(); });
-}
-
-async function handleLeadSubmit(e) {
-    e.preventDefault();
-    const name  = document.getElementById('name-input').value.trim();
-    const email = document.getElementById('email-input').value.trim();
-    if (!name || !email) { alert('Completa todos los campos'); return; }
-
-    const leadData = {
-        name, email,
-        profileUrl: STATE.profileUrl,
-        detectedLevel: STATE.detectedLevel,
-        scores: STATE.scores,
-        triggersActivated: STATE.triggersActivated.map(t => t.key),
-        answers: STATE.answers,
-        interventions: STATE.interventions,
-        potentialScore: STATE.potentialScore,
-        timestamp: new Date().toISOString()
-    };
-
-    console.log('Lead capturado:', leadData);
-
-    if (typeof gtag !== 'undefined') {
-        gtag('event', 'generate_lead', { event_category: 'Lead', event_label: 'LinkedIn Visibility v2', value: STATE.scores.VS });
-    }
-
-    STATE.view = 'success';
-    render();
 }
 
 function notifyParentHeight() {
