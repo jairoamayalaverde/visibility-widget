@@ -66,145 +66,145 @@ const CONFIG = {
         }
     },
 
-    // ── FACTORES DEL QUIZ ────────────────────────────────────
+    // ── FACTORES DEL QUIZ (PREGUNTAS UNIVERSALES) ────────────
     factors: {
         // AUTORIDAD — Pilar PV
         pv_headline: {
             dimension: 'AT', pillar: 'PV', weight: 20, critical: true,
             label: 'Headline orientado a resultado',
-            question: '¿Tu headline comunica el resultado que generas, no solo tu cargo?',
-            hint: 'Ej: "Ayudo a consultores a conseguir clientes con LinkedIn" vs "Consultor de Marketing"',
+            question: 'Tu headline (lo que aparece bajo tu nombre): ¿dice QUÉ LOGRAN las personas que trabajan contigo?',
+            hint: '✓ "Ayudo a empresas a reducir costos fiscales en 30%" · ✗ "Contador Público Certificado"',
             sensor_for: [1]
         },
         pv_about: {
             dimension: 'AT', pillar: 'PV', weight: 18, critical: true,
             label: 'About como propuesta de valor',
-            question: '¿Tu About habla de a quién ayudas y qué logran contigo?',
-            hint: 'Estructura ideal: Problema → Solución → Tu método → CTA',
+            question: 'Tu sección "Acerca de" (el texto largo de tu perfil): ¿explica a quién ayudas y qué problema específico resuelves?',
+            hint: 'Debe quedar claro: quién es tu cliente ideal + qué resultado obtendrá. No solo tu historia laboral.',
             sensor_for: [1]
         },
         pv_resultado: {
             dimension: 'AT', pillar: 'PV', weight: 14, critical: false,
             label: 'Resultados cuantificables',
-            question: '¿Mencionas resultados concretos (números, % o impacto) en tu experiencia?',
-            hint: 'Ej: "Generé 3x más leads en 6 meses para 12 clientes del sector salud"'
+            question: 'En tu sección de Experiencia: ¿mencionas resultados concretos que has logrado? (números, porcentajes, impactos medibles)',
+            hint: '✓ "Reduje tiempos de entrega 40% en 6 meses" · ✗ "Responsable de mejora de procesos"'
         },
         // AUTORIDAD — Pilar CL
         cl_nicho: {
             dimension: 'AT', pillar: 'CL', weight: 14, critical: true,
             label: 'Nicho dominante claro',
-            question: '¿Tu perfil deja claro a quién sirves específicamente?',
-            hint: 'Nicho = sector + tipo de persona + problema concreto',
+            question: 'Si alguien lee solo tu headline y tu About: ¿puede decir EXACTAMENTE para quién trabajas?',
+            hint: 'Ejemplo claro: "médicos que quieren abrir consulta privada" o "ingenieros buscando certificación PMP". Ejemplo vago: "profesionales" o "empresas".',
             sensor_for: [2, 4]
         },
         cl_consistencia: {
             dimension: 'AT', pillar: 'CL', weight: 12, critical: false,
             label: 'Consistencia de mensaje',
-            question: '¿Headline, About y experiencia dicen lo mismo sobre tu propuesta?',
-            hint: 'Si alguien lee solo tu headline y luego tu About, ¿recibe el mismo mensaje?'
+            question: '¿Tu headline, About y primeras experiencias comunican el MISMO mensaje sobre lo que haces?',
+            hint: 'Lee las tres secciones seguidas. Si alguien se confunde sobre cuál es tu especialidad, hay inconsistencia.'
         },
         // AUTORIDAD — Pilar AF
         af_framework: {
             dimension: 'AT', pillar: 'AF', weight: 16, critical: false,
             label: 'Metodología o framework propio',
-            question: '¿Tienes un sistema, método o framework con nombre propio?',
-            hint: 'Ej: "Método VISTA", "Sistema 3C". No importa si es simple, importa que tenga nombre.',
+            question: '¿Le has puesto un NOMBRE a tu forma de trabajar? (Ej: "Método X", "Sistema Y", "Proceso Z")',
+            hint: 'Aparece mencionado en tu perfil con su nombre propio. No importa si es simple — solo que tenga nombre y lo uses.',
             sensor_for: [2, 3, 4]
         },
         af_recomendaciones: {
             dimension: 'AT', pillar: 'AF', weight: 10, critical: false,
             label: 'Recomendaciones que validan tu método',
-            question: '¿Tus recomendaciones mencionan resultados específicos o tu metodología?',
-            hint: 'No basta con "gran profesional". Busca: "Gracias a su método X, logramos Y"',
+            question: '¿Tus recomendaciones mencionan resultados específicos que lograste para esas personas?',
+            hint: 'No basta con "excelente profesional". Busca: "Gracias a [tu nombre/método], logramos [resultado concreto]"',
             sensor_for: [4]
         },
         // ALCANCE
         ac_frecuencia: {
             dimension: 'AC', pillar: 'AC', weight: 16, critical: true,
             label: 'Frecuencia de publicación',
-            question: '¿Publicas contenido en LinkedIn al menos 1 vez por semana?',
-            hint: 'Consistencia > viralidad. El algoritmo premia la regularidad.',
+            question: '¿Publicas contenido en LinkedIn al menos 1 vez por semana de forma constante?',
+            hint: 'No importa el formato (texto, imagen, documento). Lo clave es la regularidad — el algoritmo premia consistencia.',
             sensor_for: [1, 2]
         },
         ac_formato: {
             dimension: 'AC', pillar: 'AC', weight: 10, critical: false,
             label: 'Variedad de formatos',
-            question: '¿Usas múltiples formatos? (texto, carruseles, video, documentos)',
-            hint: 'Los carruseles y documentos tienen mayor alcance orgánico.'
+            question: '¿Usas diferentes formatos cuando publicas? (texto solo, carruseles, PDFs, videos)',
+            hint: 'Los carruseles y documentos PDF suelen tener mayor alcance orgánico que solo texto.'
         },
         ac_engagement: {
             dimension: 'AC', pillar: 'AC', weight: 12, critical: false,
             label: 'Engagement real',
-            question: '¿Tus publicaciones generan comentarios y conversaciones?',
-            hint: 'Los comentarios valen 4× más que los likes en el algoritmo de LinkedIn.'
+            question: '¿Tus publicaciones generan comentarios y conversaciones (no solo likes)?',
+            hint: 'Los comentarios valen mucho más que los likes en el algoritmo de LinkedIn. Busca interacción genuina.'
         },
         ac_answer_blocks: {
             dimension: 'AC', pillar: 'AC', weight: 14, critical: true,
             label: 'Contenido tipo "Answer Block"',
-            question: '¿Tu contenido responde preguntas específicas que busca tu audiencia?',
-            hint: 'Ej: "¿Cómo consigo clientes con LinkedIn?" — respuesta directa, sin rodeos.',
+            question: 'Cuando publicas en LinkedIn: ¿sueles responder UNA pregunta concreta que tu audiencia tiene?',
+            hint: 'Formato: título con la pregunta + respuesta directa en el cuerpo. No posts genéricos de reflexión.',
             sensor_for: [3]
         },
         ac_hashtags: {
             dimension: 'AC', pillar: 'AC', weight: 6, critical: false,
             label: 'Hashtags de nicho específicos',
-            question: '¿Usas 2-5 hashtags específicos de tu sector (no genéricos)?',
-            hint: 'Evita #marketing #negocios. Prefiere #SEOparaEcommerce #ConsultoríaB2B.'
+            question: '¿Usas 2-5 hashtags específicos de tu sector (no hashtags genéricos)?',
+            hint: 'Evita #negocios #éxito #liderazgo. Prefiere hashtags concretos de tu industria o especialidad.'
         },
         // CONVERSIÓN
         cv_cta: {
             dimension: 'CV', pillar: 'CV', weight: 20, critical: true,
             label: 'CTA claro en el About',
-            question: '¿Tu About termina con un llamado a la acción con siguiente paso claro?',
-            hint: 'Ej: "¿Quieres saber tu score? Escríbeme DM con la palabra SCORE"'
+            question: '¿Tu About termina con un llamado a la acción que dice EXACTAMENTE qué debe hacer alguien interesado?',
+            hint: '✓ "Escríbeme DM con la palabra ASESORÍA" · ✗ "Contáctame para más información"'
         },
         cv_oferta: {
             dimension: 'CV', pillar: 'CV', weight: 18, critical: true,
             label: 'Oferta explícita y contrateable',
-            question: '¿Está claro qué pueden contratar contigo y cómo empezar?',
-            hint: 'Tu perfil debe responder: "¿Qué haces, para quién y cómo te contrato?"',
+            question: '¿Está claro en tu perfil QUÉ pueden contratar contigo y cómo empezar?',
+            hint: 'Tu perfil debe responder sin ambigüedad: "¿Qué haces, para quién, y cómo te contrato?"',
             sensor_for: [4]
         },
         cv_featured: {
             dimension: 'CV', pillar: 'CV', weight: 12, critical: false,
             label: 'Sección Destacados activa',
-            question: '¿Usas Destacados con activos propios (PDF, web, caso de éxito)?',
-            hint: 'Es tu vitrina principal. Un lead magnet aquí puede duplicar conversión.',
+            question: '¿Usas la sección Destacados con contenido propio? (PDF descargable, link a web, caso de éxito, portfolio)',
+            hint: 'Es tu vitrina principal. Un recurso gratuito aquí (guía, checklist, template) puede duplicar conversión.',
             sensor_for: [3]
         },
         cv_contacto: {
             dimension: 'CV', pillar: 'CV', weight: 8, critical: false,
             label: 'Datos de contacto accesibles',
-            question: '¿Tu email, web o calendario están visibles en tu perfil?',
-            hint: 'Activa Creator Mode para añadir un botón de contacto personalizado.'
+            question: '¿Tu email, sitio web o calendario están visibles y fáciles de encontrar en tu perfil?',
+            hint: 'Activa Creator Mode para añadir un enlace personalizado en tu perfil (web, Calendly, formulario).'
         },
         cv_social_proof: {
             dimension: 'CV', pillar: 'CV', weight: 10, critical: false,
             label: 'Prueba social visible',
-            question: '¿Hay casos de éxito o validaciones externas fáciles de ver?',
-            hint: 'Formato: situación inicial → acción → resultado medible.',
+            question: '¿Hay casos de éxito o testimonios específicos fáciles de ver en tu perfil?',
+            hint: 'Formato ideal: situación inicial del cliente → qué hiciste → resultado medible.',
             sensor_for: [4]
         }
     },
 
     actions: {
-        pv_headline:       'Reescribe: "[Verbo resultado] + [nicho] + [sin que]". Ej: "Multiplico clientes para consultores B2B sin depender de referidos"',
-        pv_about:          'Reestructura en 4 bloques: (1) Problema de tu cliente, (2) Por qué ocurre, (3) Cómo lo resuelves, (4) CTA concreto',
-        pv_resultado:      'Añade a tus 3 últimas experiencias una métrica real. Aunque sea pequeña.',
-        cl_nicho:          'Escribe esta frase y ponla en tu headline: "Ayudo a [tipo de persona] a [resultado] sin [objeción principal]"',
-        cl_consistencia:   'Lee headline → About → primera experiencia. Si el mensaje cambia, tienes inconsistencia. Unifica.',
-        af_framework:      'Dale nombre a lo que ya haces. Si tienes un proceso, llámalo "Método [Nombre]" o "Sistema [Inicial]"',
-        af_recomendaciones:'Contacta a 3 clientes y pide que mencionen un resultado específico y tu método en su recomendación',
-        ac_frecuencia:     'Bloquea cada lunes 45 minutos para publicar. Una publicación consistente vale más que diez esporádicas',
-        ac_formato:        'Esta semana: convierte tu mejor texto en un carrusel de 5-7 slides. Máximo alcance orgánico.',
-        ac_engagement:     'Termina cada post con una pregunta que tenga respuesta de una palabra. Reduce la fricción al comentar.',
-        ac_answer_blocks:  'Escribe un post que empiece: "La pregunta que más me hacen sobre [tu tema] es..." y respóndela directamente',
-        ac_hashtags:       'Usa exactamente 3 hashtags: 1 muy específico de nicho, 1 intermedio, 1 amplio. Nunca más de 5.',
-        cv_cta:            'Última línea del About: "Si quieres [resultado concreto], escríbeme DM con la palabra [PALABRA]"',
-        cv_oferta:         'Añade en Servicios o en About: qué ofreces, para quién, y la siguiente acción para contratarte',
-        cv_featured:       'Fija en Destacados: un PDF de valor gratuito, tu web, y tu mejor caso de éxito (en ese orden)',
-        cv_contacto:       'Activa Creator Mode → añade enlace → pon tu Calendly o email directo',
-        cv_social_proof:   'Solicita 1 testimonio en formato: "Antes tenía X. Con [Tu nombre] logramos Y en Z tiempo"'
+        pv_headline:       'Reescribe tu headline con esta estructura: "[Verbo de resultado] + [para quién] + [sin/con qué]". Ejemplo: "Reduzco costos fiscales para pymes sin auditorías invasivas"',
+        pv_about:          'Reestructura tu About en 4 bloques: (1) Problema que ves en tu mercado, (2) Por qué ese problema existe, (3) Cómo lo resuelves tú, (4) CTA con siguiente paso claro',
+        pv_resultado:      'Añade a tus 3 últimas experiencias una métrica real de impacto. Aunque sea un número pequeño, ponlo.',
+        cl_nicho:          'Completa esta frase y ponla en tu headline: "Ayudo a [tipo específico de persona/empresa] a [resultado concreto] sin [objeción principal que tienen]"',
+        cl_consistencia:   'Lee tu headline → About → primera experiencia. Si el mensaje central cambia entre las tres, tienes inconsistencia. Unifica en torno a UN mensaje dominante.',
+        af_framework:      'Dale nombre a lo que ya haces. Si tienes un proceso de trabajo, bautízalo como "Método [Inicial de tu nombre]" o "Sistema [Concepto clave]"',
+        af_recomendaciones:'Contacta a 3 personas que hayan trabajado contigo y pídeles que mencionen un resultado numérico específico en su recomendación de LinkedIn',
+        ac_frecuencia:     'Bloquea cada lunes 45 minutos en tu calendario solo para publicar en LinkedIn. Una publicación semanal consistente vale más que diez esporádicas',
+        ac_formato:        'Esta semana: toma tu mejor contenido de texto y conviértelo en un carrusel de 5-7 slides. Suele generar 3-5x más alcance.',
+        ac_engagement:     'Termina tus próximos 3 posts con una pregunta que se pueda responder en UNA palabra. Reduce fricción = más comentarios.',
+        ac_answer_blocks:  'Escribe un post que empiece: "La pregunta que más me hacen sobre [tu tema] es..." y respóndela de forma directa en 5 puntos',
+        ac_hashtags:       'Usa exactamente 3 hashtags por post: 1 muy específico de tu nicho, 1 intermedio, 1 amplio. Nunca más de 5 en total.',
+        cv_cta:            'Última línea de tu About: "Si quieres [resultado concreto que ofreces], envíame un mensaje con la palabra [PALABRA CLAVE]"',
+        cv_oferta:         'Añade en tu About o en Servicios: qué ofreces exactamente, para quién es, y cuál es el primer paso para trabajar contigo',
+        cv_featured:       'Fija en Destacados estos 3 elementos (en orden): (1) PDF de valor gratuito, (2) tu sitio web, (3) tu mejor caso de éxito documentado',
+        cv_contacto:       'Activa Creator Mode en tu perfil → añade un enlace personalizado → pon tu Calendly, email directo o formulario de contacto',
+        cv_social_proof:   'Solicita 1 testimonio en este formato: "Antes de trabajar con [tu nombre] teníamos X. Logramos Y en Z tiempo gracias a [tu método]"'
     }
 };
 
@@ -242,12 +242,13 @@ function initFactors() {
 function render() {
     const app = document.getElementById('app');
     switch (STATE.view) {
-        case 'input':     app.innerHTML = renderInput();     attachInputListeners();   break;
-        case 'quiz':      app.innerHTML = renderQuiz();      attachQuizListeners();    break;
-        case 'analyzing': app.innerHTML = renderAnalyzing(); break;
-        case 'results':   app.innerHTML = renderResults();   attachResultsListeners(); break;
-        case 'success':   app.innerHTML = renderSuccess();   break;
-        case 'error':     app.innerHTML = renderError();     attachErrorListeners();   break;
+        case 'input':      app.innerHTML = renderInput();      attachInputListeners();   break;
+        case 'onboarding': app.innerHTML = renderOnboarding(); runOnboarding();          break;
+        case 'quiz':       app.innerHTML = renderQuiz();       attachQuizListeners();    break;
+        case 'analyzing':  app.innerHTML = renderAnalyzing();  break;
+        case 'results':    app.innerHTML = renderResults();    attachResultsListeners(); break;
+        case 'success':    app.innerHTML = renderSuccess();    break;
+        case 'error':      app.innerHTML = renderError();      attachErrorListeners();   break;
     }
     notifyParentHeight();
 }
@@ -290,7 +291,7 @@ function startQuiz() {
     STATE.profileUrl = url;
     STATE.currentQuestion = 0;
     STATE.answers = {};
-    STATE.view = 'quiz';
+    STATE.view = 'onboarding';
     render();
 }
 
@@ -300,6 +301,51 @@ function showInputError(msg) {
     err.className = 'input-error';
     err.textContent = msg;
     document.getElementById('profile-input').after(err);
+}
+
+// ── ONBOARDING ───────────────────────────────────────────────
+
+function renderOnboarding() {
+    return `
+        <div class="onboarding-screen">
+            <div class="onboarding-check">✓</div>
+            <div class="onboarding-url">${STATE.profileUrl}</div>
+            <div class="onboarding-steps">
+                <div class="ob-step" id="ob-step-1">
+                    <span class="ob-dot"></span>
+                    <span class="ob-text">Perfil registrado</span>
+                </div>
+                <div class="ob-step" id="ob-step-2">
+                    <span class="ob-dot"></span>
+                    <span class="ob-text">17 factores de visibilidad detectados</span>
+                </div>
+                <div class="ob-step" id="ob-step-3">
+                    <span class="ob-dot"></span>
+                    <span class="ob-text">Necesitamos validar algunos datos contigo</span>
+                </div>
+            </div>
+            <div class="onboarding-explainer">
+                <p>LinkedIn no permite acceso directo a perfiles. Para darte tu score exacto, necesitamos que respondas <strong>17 preguntas rápidas</strong> sobre tu perfil.</p>
+                <p class="ob-meta">⏱ Tiempo estimado: <strong>3 minutos</strong> · Precisión: <strong>determinística</strong></p>
+            </div>
+        </div>
+    `;
+}
+
+async function runOnboarding() {
+    await delay(400);
+    document.getElementById('ob-step-1')?.classList.add('active');
+    await delay(800);
+    document.getElementById('ob-step-1')?.classList.add('done');
+    document.getElementById('ob-step-2')?.classList.add('active');
+    await delay(900);
+    document.getElementById('ob-step-2')?.classList.add('done');
+    document.getElementById('ob-step-3')?.classList.add('active');
+    await delay(1000);
+    document.getElementById('ob-step-3')?.classList.add('done');
+    await delay(600);
+    STATE.view = 'quiz';
+    render();
 }
 
 // ── QUIZ ─────────────────────────────────────────────────────
@@ -714,7 +760,7 @@ const LEAD_CONTENT = {
         items: [
             'Diagnóstico de los 17 factores con score individual',
             'Plantilla de headline orientado a resultado (lista para copiar)',
-            'Estructura de About en 4 bloques con ejemplos de tu nicho',
+            'Estructura de About en 4 bloques con ejemplos de tu sector',
             'Checklist de activación: 7 cambios en 7 días'
         ]
     },
@@ -853,20 +899,6 @@ function renderSuccess() {
         </div>`;
 }
 
-function attachResultsListeners() {
-    document.getElementById('lead-form')?.addEventListener('submit', handleLeadSubmit);
-}
-
-function renderSuccess() {
-    return `
-        <div class="success-message">
-            <div class="success-icon">✓</div>
-            <h2>¡Reporte en camino!</h2>
-            <p>Revisa tu bandeja en los próximos minutos.</p>
-            <p class="success-hint">¿No lo ves? Revisa spam o promociones.</p>
-        </div>`;
-}
-
 function renderError() {
     return `
         <div class="error-message">
@@ -874,6 +906,10 @@ function renderError() {
             <p>${STATE.errorMessage || 'Error inesperado. Intenta de nuevo.'}</p>
             <button class="retry-btn" id="retry-btn">Reintentar</button>
         </div>`;
+}
+
+function attachResultsListeners() {
+    document.getElementById('lead-form')?.addEventListener('submit', handleLeadSubmit);
 }
 
 function attachErrorListeners() {
