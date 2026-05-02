@@ -531,77 +531,108 @@ function getNextLevelGap() {
 
 function renderResults() {
     return `
-        ${renderResultsHero()}
+        ${renderScoreAndBreakdown()}
         ${STATE.triggersActivated.length ? renderTriggers() : ''}
-        ${renderDimensionBreakdown()}
         ${renderNextLevelGap()}
         ${renderInterventions()}
         ${renderLeadCapture()}
     `;
 }
 
-function renderResultsHero() {
-    const { VS, AT, AC, CV } = STATE.scores;
+// ── SECCIÓN UNIFICADA: score VS + nivel + 3 dimensiones ──────
+function renderScoreAndBreakdown() {
+    const { VS, AT, AC, CV, PV, CL, AF } = STATE.scores;
     const level = STATE.detectedLevel;
     const m = CONFIG.levelSensors[level];
+    const w = CONFIG.authorityWeights[level];
     const passCount = Object.values(STATE.answers).filter(Boolean).length;
     const failCount = STATE.allFactors.length - passCount;
 
     return `
-        <div class="results-hero">
-            <div class="results-hero-grid">
-                <div class="hero-score-col">
-                    <div class="score-label-top">VISIBILITY SCORE</div>
-                    <div class="score-display">
-                        <span class="score-number">${VS}</span>
-                        <span class="score-max">/100</span>
+        <div class="score-breakdown-card">
+            <div class="sbc-top">
+                <div class="sbc-score-col">
+                    <div class="sbc-vs-label">VISIBILITY SCORE</div>
+                    <div class="sbc-vs-number">${VS}<span class="sbc-vs-max">/100</span></div>
+                    <div class="sbc-level-badge" style="color:${m.color};border-color:${m.color}44;background:${m.color}12">
+                        N${level} · ${m.name}
                     </div>
-                    <div class="maturity-badge" style="border-color:${m.color};color:${m.color};background:${m.color}18">
-                        NIVEL ${level} · ${m.name}
-                    </div>
-                    <p class="maturity-desc">${m.desc}</p>
-                    <div class="level-dots">
+                    <p class="sbc-level-desc">${m.desc}</p>
+                    <div class="sbc-dots">
                         ${[1,2,3,4].map(l => `
-                            <div class="level-dot ${l <= level ? 'active' : ''}" style="${l <= level ? `background:${m.color};border-color:${m.color}` : ''}">
-                                <span>${l}</span>
+                            <div class="sbc-dot ${l <= level ? 'sbc-dot--on' : ''}"
+                                 style="${l <= level ? `background:${m.color};border-color:${m.color}` : ''}">
+                                ${l}
                             </div>`).join('')}
                     </div>
                 </div>
-                <div class="hero-stats-col">
-                    <div class="mini-stat-row">
-                        <div class="mini-stat">
-                            <div class="mini-stat-value good">${passCount}</div>
-                            <div class="mini-stat-label">Factores OK</div>
-                        </div>
-                        <div class="mini-stat">
-                            <div class="mini-stat-value bad">${failCount}</div>
-                            <div class="mini-stat-label">A mejorar</div>
-                        </div>
-                    </div>
-                    <div class="dimension-mini-bars">
-                        ${miniBar('Autoridad', AT, '#7c3aed')}
-                        ${miniBar('Alcance',   AC, '#0891b2')}
-                        ${miniBar('Conversión',CV, '#dc2626')}
-                    </div>
-                    <div class="potential-row">
-                        <div class="potential-label">Score potencial</div>
-                        <div class="potential-value">${STATE.potentialScore}<span>/100</span></div>
-                    </div>
+                <div class="sbc-dims-col">
+                    ${compactDimCard('AT','Autoridad', AT,'#7c3aed','30%', [
+                        {name:`PV ×${w.pv}`, score:PV},
+                        {name:`CL ×${w.cl}`, score:CL},
+                        {name:`AF ×${w.af}`, score:AF}
+                    ])}
+                    ${compactDimCard('AC','Alcance',    AC,'#0891b2','30%',[])}
+                    ${compactDimCard('CV','Conversión', CV,'#dc2626','40%',[])}
                 </div>
             </div>
-            <div class="profile-tag">${STATE.profileUrl}</div>
+            <div class="sbc-meta">
+                <div class="sbc-meta-item">
+                    <span class="sbc-meta-val sbc-good">${passCount}</span>
+                    <span class="sbc-meta-label">Factores OK</span>
+                </div>
+                <div class="sbc-meta-divider"></div>
+                <div class="sbc-meta-item">
+                    <span class="sbc-meta-val sbc-bad">${failCount}</span>
+                    <span class="sbc-meta-label">A mejorar</span>
+                </div>
+                <div class="sbc-meta-divider"></div>
+                <div class="sbc-meta-item">
+                    <span class="sbc-meta-val sbc-potential">${STATE.potentialScore}</span>
+                    <span class="sbc-meta-label">Score potencial</span>
+                </div>
+                <div class="sbc-meta-divider"></div>
+                <div class="sbc-meta-item sbc-meta-profile">
+                    <span class="sbc-meta-label">Perfil analizado</span>
+                    <span class="sbc-meta-url">${STATE.profileUrl}</span>
+                </div>
+            </div>
         </div>
     `;
 }
 
-function miniBar(label, score, color) {
+function compactDimCard(key, name, score, color, vsWeight, subpillars) {
+    const passed = STATE.allFactors.filter(f => f.dimension === key && STATE.answers[f.id]).length;
+    const total  = STATE.allFactors.filter(f => f.dimension === key).length;
+    const statusLabel = score >= 75 ? 'Sólido' : score >= 50 ? 'Mejorable' : 'Crítico';
+    const statusColor = score >= 75 ? '#10b981' : score >= 50 ? '#f59e0b' : '#ef4444';
+
     return `
-        <div class="mini-bar-row">
-            <span class="mini-bar-label">${label}</span>
-            <div class="mini-bar-track">
-                <div class="mini-bar-fill" style="width:${score}%;background:${color}"></div>
+        <div class="cdc" style="--cdc-color:${color}">
+            <div class="cdc-header">
+                <span class="cdc-key" style="color:${color}">${key}</span>
+                <span class="cdc-name">${name}</span>
+                <span class="cdc-weight">${vsWeight}</span>
             </div>
-            <span class="mini-bar-val" style="color:${color}">${score}</span>
+            <div class="cdc-score-row">
+                <span class="cdc-score" style="color:${color}">${score}</span>
+                <span class="cdc-status" style="color:${statusColor}">${statusLabel}</span>
+                <span class="cdc-ok">${passed}/${total}</span>
+            </div>
+            <div class="cdc-bar-track">
+                <div class="cdc-bar-fill" style="width:${score}%;background:${color}"></div>
+            </div>
+            ${subpillars.length ? `
+                <div class="cdc-subpillars">
+                    ${subpillars.map(sp => `
+                        <div class="cdc-sp-row">
+                            <span class="cdc-sp-name">${sp.name}</span>
+                            <div class="cdc-sp-track">
+                                <div class="cdc-sp-fill" style="width:${sp.score}%;background:${color}55"></div>
+                            </div>
+                            <span class="cdc-sp-val">${sp.score}</span>
+                        </div>`).join('')}
+                </div>` : ''}
         </div>`;
 }
 
@@ -615,64 +646,6 @@ function renderTriggers() {
             </div>
             <p class="trigger-message">${t.message}</p>
         </div>`).join('');
-}
-
-function renderDimensionBreakdown() {
-    const { AT, AC, CV, PV, CL, AF } = STATE.scores;
-    const level = STATE.detectedLevel;
-    const w = CONFIG.authorityWeights[level];
-
-    return `
-        <div class="breakdown-section">
-            <div class="breakdown-header">
-                <h3 class="section-title">Desglose del modelo</h3>
-                <span class="breakdown-level-note">Pesos AT · Nivel ${level}: PV×${w.pv} · CL×${w.cl} · AF×${w.af}</span>
-            </div>
-            <div class="breakdown-grid">
-                ${dimCard('AT','Autoridad', AT,'#7c3aed','30%',[
-                    {name:`PV · Prop. valor ×${w.pv}`, score:PV},
-                    {name:`CL · Posición ×${w.cl}`,    score:CL},
-                    {name:`AF · Framework ×${w.af}`,   score:AF}
-                ])}
-                ${dimCard('AC','Alcance',   AC,'#0891b2','30%',[])}
-                ${dimCard('CV','Conversión',CV,'#dc2626','40%',[])}
-            </div>
-        </div>`;
-}
-
-function dimCard(key, name, score, color, vsWeight, subpillars) {
-    const passed = STATE.allFactors.filter(f => f.dimension === key && STATE.answers[f.id]).length;
-    const total  = STATE.allFactors.filter(f => f.dimension === key).length;
-    const statusLabel = score >= 75 ? 'Sólido' : score >= 50 ? 'Mejorable' : 'Crítico';
-    const statusColor = score >= 75 ? '#10b981' : score >= 50 ? '#f59e0b' : '#ef4444';
-
-    return `
-        <div class="dim-card" style="--dim-color:${color}">
-            <div class="dim-header">
-                <span class="dim-key">${key}</span>
-                <span class="dim-name">${name}</span>
-                <span class="dim-weight">${vsWeight}</span>
-            </div>
-            <div class="dim-score-big">${score}</div>
-            <div class="dim-bar-track">
-                <div class="dim-bar-fill" style="width:${score}%;background:${color}"></div>
-            </div>
-            <div class="dim-meta">
-                <span style="color:${statusColor}">${statusLabel}</span>
-                <span>${passed}/${total} OK</span>
-            </div>
-            ${subpillars.length ? `
-                <div class="dim-subpillars">
-                    ${subpillars.map(sp => `
-                        <div class="subpillar-row">
-                            <span class="sp-name">${sp.name}</span>
-                            <div class="sp-bar-track">
-                                <div class="sp-bar-fill" style="width:${sp.score}%;background:${color}55"></div>
-                            </div>
-                            <span class="sp-score">${sp.score}</span>
-                        </div>`).join('')}
-                </div>` : ''}
-        </div>`;
 }
 
 function renderNextLevelGap() {
@@ -727,27 +700,156 @@ function renderInterventions() {
         </div>`;
 }
 
+// ============================================================
+// LEAD CAPTURE — personalizado por nivel y triggers
+// ============================================================
+
+// Contenido dinámico según el nivel detectado
+const LEAD_CONTENT = {
+    1: {
+        urgency:   'Tu perfil está en modo invisible.',
+        headline:  'El sistema no sabe qué hacer contigo todavía.',
+        sub:       'Lo primero no es más contenido. Es estructura. Recibe el diagnóstico completo con el plan exacto para que el algoritmo empiece a trabajar a tu favor.',
+        cta:       'Quiero salir de la invisibilidad',
+        items: [
+            'Diagnóstico de los 17 factores con score individual',
+            'Plantilla de headline orientado a resultado (lista para copiar)',
+            'Estructura de About en 4 bloques con ejemplos de tu nicho',
+            'Checklist de activación: 7 cambios en 7 días'
+        ]
+    },
+    2: {
+        urgency:   'Estás cerca. Pero "cerca" no convierte.',
+        headline:  'Tu perfil informa. Aún no vende.',
+        sub:       'Tienes nicho y actividad. Lo que falta es jerarquía. Recibe el plan para consolidar tu mensaje en una sola promesa que domine.',
+        cta:       'Quiero que mi perfil empiece a vender',
+        items: [
+            'Diagnóstico completo + detección del Efecto Generalista',
+            'Framework para nombrar y estructurar tu metodología propia',
+            'Plantilla de About con Answer Block integrado',
+            'Plan de contenido de 4 semanas para construir autoridad'
+        ]
+    },
+    3: {
+        urgency:   'Tu sistema existe. Pocos lo ven todavía.',
+        headline:  'Tienes diferenciación. Falta dominancia.',
+        sub:       'Ya tienes framework y estructura. El siguiente paso es que tu nombre se convierta en sinónimo de tu categoría. Recibe el roadmap para el salto al Nivel 4.',
+        cta:       'Quiero dominar mi categoría',
+        items: [
+            'Diagnóstico de brechas entre Nivel 3 y Nivel 4',
+            'Estrategia de Answer Blocks para ser citado por la IA',
+            'Sistema de prueba social: cómo solicitar recomendaciones que validen tu método',
+            'Auditoría de la sección Destacados como landing page'
+        ]
+    },
+    4: {
+        urgency:   'Nivel 4 alcanzado. Hora de sistematizar.',
+        headline:  'Eres la opción obvia. Ahora escálalo.',
+        sub:       'Estás en el percentil superior. Recibe el análisis de los puntos donde aún hay margen de optimización y la estrategia para mantener la autoridad.',
+        cta:       'Quiero el análisis de optimización',
+        items: [
+            'Reporte completo con benchmarks de Nivel 4',
+            'Identificación de gaps residuales en AT, AC y CV',
+            'Estrategia de contenido para mantener dominio de categoría',
+            'Protocolo de actualización trimestral del perfil'
+        ]
+    }
+};
+
 function renderLeadCapture() {
-    const level = STATE.detectedLevel;
+    const level   = STATE.detectedLevel;
+    const m       = CONFIG.levelSensors[level];
+    const content = LEAD_CONTENT[level];
+    const VS      = STATE.scores.VS;
+    const hasGeneralista = STATE.triggersActivated.some(t => t.key === 'efectoGeneralista');
+
+    // Override de contenido si el Efecto Generalista está activo
+    const headline = hasGeneralista
+        ? 'Ninguna de tus promesas domina todavía.'
+        : content.headline;
+    const sub = hasGeneralista
+        ? 'El diagnóstico detectó el Efecto Generalista en tu perfil. Recibe el plan exacto para eliminar el ruido y hacer que una sola promesa gane.'
+        : content.sub;
+    const cta = hasGeneralista
+        ? 'Quiero eliminar el Efecto Generalista'
+        : content.cta;
+
     return `
         <div class="lead-capture">
-            <div class="lead-badge">REPORTE COMPLETO</div>
-            <h2>Recibe tu diagnóstico detallado</h2>
-            <p>Los 17 factores evaluados + roadmap para pasar de Nivel ${level} a Nivel ${Math.min(level+1,4)}</p>
-            <ul class="lead-list">
-                <li>Reporte PDF con puntuación factor por factor</li>
-                <li>Plan de acción semana a semana</li>
-                <li>Plantillas de headline, About y CTA</li>
-                <li>Fórmula de contenido para Answer Blocks</li>
-            </ul>
+
+            <!-- Urgency strip -->
+            <div class="lc-urgency" style="border-color:${m.color}33;color:${m.color}">
+                ${content.urgency}
+            </div>
+
+            <!-- Header -->
+            <div class="lc-header">
+                <h2 class="lc-headline">${headline}</h2>
+                <p class="lc-sub">${sub}</p>
+            </div>
+
+            <!-- Score preview (lo que recibirán en el reporte) -->
+            <div class="lc-preview">
+                <div class="lc-preview-score">
+                    <span class="lc-preview-num" style="color:${m.color}">${VS}</span>
+                    <div class="lc-preview-meta">
+                        <span class="lc-preview-label">Tu score actual</span>
+                        <span class="lc-preview-potential">Potencial: ${STATE.potentialScore}/100</span>
+                    </div>
+                </div>
+                <div class="lc-preview-arrow">→</div>
+                <div class="lc-preview-items">
+                    ${content.items.map(item => `
+                        <div class="lc-item">
+                            <span class="lc-item-check" style="color:${m.color}">✓</span>
+                            <span>${item}</span>
+                        </div>`).join('')}
+                </div>
+            </div>
+
+            <!-- Form -->
             <form class="lead-form" id="lead-form">
                 <div class="form-row">
                     <input type="text"  id="name-input"  placeholder="Tu nombre" required />
                     <input type="email" id="email-input" placeholder="tu@email.com" required />
                 </div>
-                <button type="submit" class="submit-btn">Enviar mi reporte gratuito</button>
-                <div class="privacy-note">🔒 Sin spam. Solo tu diagnóstico y plan de acción.</div>
+                <button type="submit" class="submit-btn lc-btn" style="background:${m.color}">
+                    ${cta}
+                </button>
+                <div class="privacy-note">🔒 Sin spam. Solo tu diagnóstico y plan de acción personalizado.</div>
             </form>
+
+            <!-- Social proof micro -->
+            <div class="lc-social">
+                <span class="lc-social-dot"></span>
+                <span>Diagnóstico enviado en menos de 5 minutos</span>
+            </div>
+        </div>`;
+}
+
+function renderSuccess() {
+    const level = STATE.detectedLevel;
+    const m = CONFIG.levelSensors[level];
+    const nextLevel = Math.min(level + 1, 4);
+    const nextM = CONFIG.levelSensors[nextLevel];
+
+    return `
+        <div class="success-message">
+            <div class="success-icon" style="background:${m.color}">✓</div>
+            <h2>¡Reporte en camino!</h2>
+            <p>Tu diagnóstico de Nivel ${level} · <strong style="color:${m.color}">${m.name}</strong> está siendo generado.</p>
+            <p style="margin-top:12px;color:var(--muted)">Revisa tu bandeja en los próximos minutos.</p>
+
+            ${level < 4 ? `
+                <div class="success-next">
+                    <div class="success-next-label">Tu próximo objetivo</div>
+                    <div class="success-next-level" style="color:${nextM.color}">
+                        Nivel ${nextLevel} · ${nextM.name}
+                    </div>
+                    <div class="success-next-desc">${nextM.desc}</div>
+                </div>` : ''}
+
+            <p class="success-hint">¿No lo ves? Revisa spam o promociones.</p>
         </div>`;
 }
 
