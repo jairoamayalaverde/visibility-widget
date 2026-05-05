@@ -1,24 +1,15 @@
-# Visibility Score Widget
+# LinkedIn Visibility Score v2.5
+Widget de diagnóstico de LinkedIn con radar chart, quote personalizada y análisis visual.
 
-Widget de análisis SEO para captura de leads.
+## 🎯 Características v2.5
 
-## ⚙️ SETUP INICIAL (IMPORTANTE)
-
-### 1. Configurar el proxy PHP
-
-Este widget necesita un proxy PHP en tu servidor para evitar problemas de CORS.
-
-**Sube `html-proxy-widget.php` a la raíz de tu servidor:**
-```
-https://jairoamaya.co/html-proxy-widget.php
-```
-
-**Verifica que funciona:**
-```
-https://jairoamaya.co/html-proxy-widget.php?url=https://jairoamaya.co
-```
-
-Deberías ver el HTML de tu sitio.
+- ✅ **17 factores** determinísticos de visibilidad
+- ✅ **Radar chart pentagonal** con logo de LinkedIn
+- ✅ **Quote personalizada** por nivel + situación
+- ✅ **Badge de nicho** detectado (input del usuario)
+- ✅ **4 niveles de madurez** con pesos dinámicos
+- ✅ **Conversión directa** a WhatsApp con score + URL
+- ✅ **Sin dependencias externas** — 100% standalone HTML
 
 ---
 
@@ -30,9 +21,9 @@ Deberías ver el HTML de tu sitio.
    ```bash
    git init
    git add .
-   git commit -m "Initial commit"
+   git commit -m "LinkedIn Visibility Score v2.5"
    git branch -M main
-   git remote add origin https://github.com/TU-USUARIO/visibility-widget.git
+   git remote add origin https://github.com/TU-USUARIO/linkedin-visibility-v2.5.git
    git push -u origin main
    ```
 
@@ -40,11 +31,14 @@ Deberías ver el HTML de tu sitio.
    - Ve a https://vercel.com
    - Click "New Project"
    - Importa tu repo de GitHub
+   - **Framework Preset:** Other
+   - **Build Command:** (dejar vacío)
+   - **Output Directory:** `.`
    - Deploy automático
 
 3. **URL final:**
    ```
-   https://visibility-widget.vercel.app
+   https://linkedin-visibility-v2-5.vercel.app
    ```
 
 ### Opción 2: Deploy directo con Vercel CLI
@@ -53,24 +47,29 @@ Deberías ver el HTML de tu sitio.
 # Instalar Vercel CLI
 npm i -g vercel
 
-# Deploy
+# Deploy a preview
 vercel
 
 # Deploy a producción
 vercel --prod
 ```
 
+---
+
 ## 📦 Estructura del proyecto
 
 ```
 /
-├── index.html       # Página principal
-├── widget.js        # Lógica del widget
-├── vercel.json      # Configuración de Vercel
-└── README.md        # Este archivo
+├── index.html                                    # Widget completo (renombrar de linkedin-visibility-score-v2.5-visual.html)
+├── vercel.json                                   # Configuración de Vercel
+└── README.md                                     # Este archivo
 ```
 
-## 🔗 Integración en Elementor
+**IMPORTANTE:** Renombra `linkedin-visibility-score-v2.5-visual.html` a `index.html` antes de hacer commit.
+
+---
+
+## 🔗 Integración en WordPress/Elementor
 
 Una vez deployado, usa este código en un widget HTML de Elementor:
 
@@ -78,35 +77,131 @@ Una vez deployado, usa este código en un widget HTML de Elementor:
 <iframe 
   src="https://TU-URL.vercel.app" 
   width="100%" 
-  height="2400px" 
+  height="2800px" 
   frameborder="0" 
-  style="border:none; background:#000;"
-  id="visibility-widget"
+  style="border:none; background:#060810;"
+  id="linkedin-visibility-widget"
 ></iframe>
 
 <script>
 window.addEventListener('message', function(e) {
-  if (e.data.type === 'visibility-widget-resize') {
-    document.getElementById('visibility-widget').style.height = e.data.height + 'px';
+  if (e.data.type === 'linkedin-visibility-resize') {
+    document.getElementById('linkedin-visibility-widget').style.height = e.data.height + 'px';
   }
 });
 </script>
 ```
 
+**Altura inicial:** `2800px` (se ajusta automáticamente con el script)
+
+---
+
 ## 🛠️ Desarrollo local
 
 ```bash
-# Servidor local simple
+# Opción 1: Python
 python3 -m http.server 8000
 
-# O con Node.js
+# Opción 2: Node.js
 npx http-server -p 8000
+
+# Opción 3: PHP
+php -S localhost:8000
 ```
 
 Abre http://localhost:8000
 
-## 📝 Notas
+---
 
-- El widget usa el proxy en `jairoamaya.co/html-proxy.php`
-- Los leads se capturan vía console.log (agregar backend después)
-- Auto-resize funciona en iframes
+## 📊 Flujo del usuario
+
+1. **Input:** Usuario ingresa URL de LinkedIn
+2. **Onboarding:** Animación de validación (4s)
+3. **Instructions:** Demo interactivo de botones
+4. **Pregunta de nicho:** Input de texto libre (ej: "Consultores B2B")
+5. **Quiz:** 17 preguntas de validación manual
+6. **Analyzing:** Animación de cálculo (6 pasos)
+7. **Results:**
+   - Badge de nicho detectado
+   - Score + Nivel
+   - Quote personalizada
+   - **Radar chart pentagonal** ← Visual único
+   - Plan de intervención (top 5)
+   - WhatsApp CTA
+
+**Tiempo total:** ~3 minutos
+
+---
+
+## 🎨 Personalización
+
+### Cambiar número de WhatsApp
+
+Busca en `index.html`:
+```javascript
+const whatsappUrl = `https://wa.me/573012963640?text=${whatsappMessage}`;
+```
+
+Reemplaza `573012963640` con tu número (incluye código de país sin +).
+
+### Cambiar colores de niveles
+
+Busca en `index.html`:
+```javascript
+levelSensors: {
+    1: { name: 'EXPLORACIÓN', color: '#6b7280', ... },
+    2: { name: 'POSICIONAMIENTO', color: '#f59e0b', ... },
+    3: { name: 'DIFERENCIACIÓN', color: '#3b82f6', ... },
+    4: { name: 'AUTORIDAD', color: '#10b981', ... }
+}
+```
+
+---
+
+## 📝 Diferencias con v2.0
+
+| Feature | v2.0 | v2.5 |
+|---------|------|------|
+| Radar chart | ❌ | ✅ |
+| Quote personalizada | ❌ | ✅ |
+| Badge de nicho | ❌ | ✅ |
+| Logo LinkedIn en radar | ❌ | ✅ |
+| Análisis LLM | ❌ | ❌ |
+| Conversión WhatsApp | ✅ | ✅ |
+
+---
+
+## 🔧 Troubleshooting
+
+### El iframe no se ve en WordPress
+- Verifica que el height inicial sea suficiente (`2800px`)
+- Confirma que el script de resize esté después del `</iframe>`
+
+### El auto-resize no funciona
+- Abre DevTools → Console
+- Verifica que no haya errores de CORS
+- El mensaje `linkedin-visibility-resize` debe aparecer en la consola
+
+### Quiero cambiar el copy del hero
+Busca en `index.html` la sección:
+```html
+<div class="hero-section">
+    <div class="hero-eyebrow">MODELO DETERMINÍSTICO</div>
+    <h1>LinkedIn Visibility<br><em>Score?</em></h1>
+    ...
+</div>
+```
+
+---
+
+## 📧 Soporte
+
+Creado por **Jairo Amaya**  
+🌐 https://jairoamaya.co  
+📱 WhatsApp: +57 301 296 3640
+
+---
+
+## 📄 Licencia
+
+Uso exclusivo de Jairo Amaya Consulting. Prohibida la distribución sin autorización.
