@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LinkedIn Visibility Score | Analiza tu perfil </title>
+    <title>LinkedIn Visibility Score v2.5 | Análisis Visual Mejorado</title>
     <meta name="description" content="Descubre en 3 minutos si tu perfil de LinkedIn te hace destacar o te hace invisible. Modelo determinístico VS = 0.30·AT + 0.30·AC + 0.40·CV">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -102,6 +102,124 @@
             color: var(--muted);
             line-height: 1.5;
             margin-bottom: 16px;
+        }
+
+        /* ── RADAR CHART ──────────────────────────────────── */
+        .radar-container {
+            background: var(--bg3);
+            border: 1px solid var(--border2);
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .radar-canvas-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            aspect-ratio: 1;
+            margin-bottom: 24px;
+        }
+
+        .radar-canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        .radar-legend {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .radar-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .radar-legend-icon {
+            font-size: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+        }
+
+        .radar-legend-icon svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .radar-legend-label {
+            flex: 1;
+        }
+
+        .radar-legend-value {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        /* ── PERSONALIZED QUOTE ───────────────────────────── */
+        .personalized-quote {
+            background: var(--bg3);
+            border-left: 3px solid var(--cyan);
+            border-radius: 10px;
+            padding: 20px 24px;
+            margin-bottom: 20px;
+            font-family: 'Georgia', serif;
+            font-style: italic;
+            font-size: 16px;
+            color: var(--text);
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        .personalized-quote::before {
+            content: '"';
+            font-size: 48px;
+            color: var(--cyan);
+            opacity: 0.3;
+            line-height: 0;
+            margin-right: 8px;
+        }
+
+        .personalized-quote::after {
+            content: '"';
+            font-size: 48px;
+            color: var(--cyan);
+            opacity: 0.3;
+            line-height: 0;
+            margin-left: 8px;
+        }
+
+        /* ── NICHE BADGE ──────────────────────────────────── */
+        .niche-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--amber), #f97316);
+            color: var(--bg);
+            font-family: var(--font-display);
+            font-size: 14px;
+            font-weight: 700;
+            padding: 8px 20px;
+            border-radius: 24px;
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
+            text-align: center;
+        }
+
+        .niche-badge-icon {
+            margin-right: 6px;
         }
         .sbc-dots { display: flex; gap: 6px; }
         .sbc-dot {
@@ -311,52 +429,55 @@
         /* ── HERO HEADER ───────────────────────────────── */
         .hero-section {
             text-align: center;
-            padding: 60px 0 48px;
+            padding: 80px 0 60px;
         }
 
         .hero-eyebrow {
             font-family: var(--font-mono);
             font-size: 11px;
             color: var(--cyan);
-            letter-spacing: 3px;
+            letter-spacing: 4px;
             text-transform: uppercase;
-            margin-bottom: 20px;
-            opacity: 0.8;
+            margin-bottom: 32px;
+            opacity: 0.9;
         }
 
         .hero-section h1 {
             font-family: var(--font-display);
-            font-size: clamp(32px, 6vw, 54px);
+            font-size: clamp(48px, 8vw, 72px);
             font-weight: 800;
-            line-height: 1.08;
-            margin-bottom: 20px;
+            line-height: 1;
+            margin-bottom: 28px;
             color: var(--text);
-            letter-spacing: -1px;
+            letter-spacing: -2px;
         }
 
         .hero-section h1 em {
             font-style: normal;
             color: var(--cyan);
+            display: block;
+            margin-top: 8px;
         }
 
         .hero-section p {
-            font-size: 17px;
+            font-size: 16px;
             color: var(--muted);
-            max-width: 520px;
-            margin: 0 auto 32px;
+            max-width: 640px;
+            margin: 0 auto 36px;
             font-weight: 300;
+            line-height: 1.6;
         }
 
         .hero-formula {
             display: inline-block;
             font-family: var(--font-mono);
-            font-size: 12px;
-            color: var(--muted);
-            background: var(--bg3);
+            font-size: 13px;
+            color: var(--cyan);
+            background: transparent;
             border: 1px solid var(--border2);
-            padding: 8px 20px;
-            border-radius: 4px;
-            letter-spacing: 1px;
+            padding: 10px 24px;
+            border-radius: 6px;
+            letter-spacing: 0.5px;
         }
 
         /* ── INPUT BOX ─────────────────────────────────── */
@@ -945,6 +1066,53 @@
             font-weight: 500;
         }
 
+        .niche-input {
+            width: 100%;
+            background: var(--bg);
+            border: 2px solid var(--border2);
+            border-radius: 8px;
+            padding: 16px 20px;
+            color: var(--text);
+            font-size: 16px;
+            font-family: var(--font-body);
+            margin: 20px 0;
+            transition: border-color 0.2s;
+        }
+
+        .niche-input:focus {
+            outline: none;
+            border-color: var(--cyan);
+        }
+
+        .niche-input::placeholder {
+            color: var(--muted2);
+        }
+
+        .answer-continue {
+            width: 100%;
+            background: var(--cyan);
+            color: var(--bg);
+            border: none;
+            padding: 18px 32px;
+            border-radius: 8px;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 10px;
+        }
+
+        .answer-continue:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .answer-continue:not(:disabled):hover {
+            background: #33ddff;
+            transform: translateY(-1px);
+        }
+
         .quiz-profile-ref {
             font-size: 11px;
             color: var(--muted2);
@@ -1508,10 +1676,10 @@
 <body>
     <div class="container">
         <div class="hero-section">
-            <div class="hero-eyebrow">Modelo determinístico</div>
-            <h1>LinkedIn Visibility<br><em>Score</em>?</h1>
-            <p>17 factores. 3 minutos. Una herramienta que determina si el sistema te muestra o te ignora.</p>
-            <div class="hero-formula">VS = 0.30·AT + 0.30·AC + 0.40·CV</div>
+            <div class="hero-eyebrow">MODELO DETERMINÍSTICO</div>
+            <h1>LinkedIn Visibility<br><em>Score?</em></h1>
+            <p>17 factores. 3 minutos. Una herramienta que determina si el<br>sistema te muestra o te ignora.</p>
+            <div class="hero-formula">VS = 0.30·Autoridad + 0.30·Alcance + 0.40·Conversión</div>
         </div>
 
         <div id="app"></div>
@@ -1722,6 +1890,7 @@ const CONFIG = {
 const STATE = {
     view: 'input',
     profileUrl: '',
+    nicheText: '',
     currentQuestion: 0,
     answers: {},
     allFactors: [],
@@ -1927,6 +2096,37 @@ function attachInstructionsListeners() {
 }
 
 function renderQuiz() {
+    // Pregunta especial de nicho al inicio (pregunta 0)
+    if (STATE.currentQuestion === 0 && !STATE.nicheText) {
+        return `
+            <div class="quiz-container">
+                <div class="quiz-progress">
+                    <div class="quiz-progress-track">
+                        <div class="quiz-progress-fill" style="width:0%"></div>
+                    </div>
+                    <div class="quiz-progress-label">
+                        <span>Pregunta inicial</span>
+                        <span>17 factores después</span>
+                    </div>
+                </div>
+                <div class="quiz-question">
+                    <div class="question-number">🎯</div>
+                    <h2>¿A qué nicho o sector sirves?</h2>
+                    <p class="question-detail">Describe en una frase corta a quién ayudas específicamente. Ejemplo: "Médicos que quieren abrir consulta privada" o "Founders de SaaS B2B"</p>
+                    <input type="text" id="niche-input" class="niche-input" 
+                           placeholder="Ej: Consultores independientes en transformación digital"
+                           maxlength="100" />
+                    <p class="question-hint">💡 Usaremos esto para personalizar tu análisis</p>
+                </div>
+                <button class="answer-btn answer-continue" id="niche-continue" disabled>
+                    Continuar al diagnóstico →
+                </button>
+                <div class="quiz-profile-ref">Analizando: <span>${STATE.profileUrl}</span></div>
+            </div>
+        `;
+    }
+
+    // Quiz normal de factores
     const factor = STATE.allFactors[STATE.currentQuestion];
     const total = STATE.allFactors.length;
     const progress = Math.round((STATE.currentQuestion / total) * 100);
@@ -1974,6 +2174,31 @@ function renderQuiz() {
 }
 
 function attachQuizListeners() {
+    // Si es la pregunta de nicho
+    const nicheInput = document.getElementById('niche-input');
+    const nicheContinue = document.getElementById('niche-continue');
+    
+    if (nicheInput && nicheContinue) {
+        nicheInput.addEventListener('input', () => {
+            nicheContinue.disabled = nicheInput.value.trim().length < 5;
+        });
+        
+        nicheContinue.addEventListener('click', () => {
+            STATE.nicheText = nicheInput.value.trim();
+            render();
+        });
+        
+        nicheInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && nicheInput.value.trim().length >= 5) {
+                STATE.nicheText = nicheInput.value.trim();
+                render();
+            }
+        });
+        
+        return;
+    }
+    
+    // Quiz normal de factores
     document.querySelectorAll('.answer-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const answer = btn.dataset.answer === 'true';
@@ -2139,12 +2364,37 @@ function getNextLevelGap() {
 }
 
 function renderResults() {
+    const hasGeneralista = STATE.triggersActivated.some(t => t.key === 'efectoGeneralista');
+    const level = STATE.detectedLevel;
+    const quote = getPersonalizedQuote(level, hasGeneralista);
+    
+    // Badge de nicho si el usuario lo ingresó
+    const nicheBadge = STATE.nicheText 
+        ? `<div class="niche-badge"><span class="niche-badge-icon">🎯</span>${STATE.nicheText}</div>` 
+        : '';
+    
     return `
+        ${nicheBadge}
         ${renderScoreAndBreakdown()}
+        <div class="personalized-quote">${quote}</div>
+        ${renderRadarChart()}
         ${STATE.triggersActivated.length ? renderTriggers() : ''}
         ${renderNextLevelGap()}
         ${renderInterventions()}
         ${renderLeadCapture()}
+    `;
+}
+
+function renderRadarChart() {
+    return `
+        <div class="radar-container">
+            <div class="radar-canvas-wrapper">
+                ${generateRadarChart(STATE.scores)}
+            </div>
+            <div class="radar-legend">
+                ${renderRadarLegend(STATE.scores)}
+            </div>
+        </div>
     `;
 }
 
@@ -2308,6 +2558,116 @@ function renderInterventions() {
         </div>`;
 }
 
+// ============================================================
+// QUOTES PERSONALIZADAS POR NIVEL/SITUACIÓN
+// ============================================================
+
+const LEVEL_QUOTES = {
+    1: {
+        normal: "Tienes potencial, pero tu perfil aún no habla por ti.",
+        generalista: "Estás diciendo muchas cosas. Ninguna con suficiente claridad."
+    },
+    2: {
+        normal: "Ya no eres invisible. Ahora necesitas ser inolvidable.",
+        generalista: "Tienes especialidad, pero el sistema aún no sabe cuál es tu promesa dominante."
+    },
+    3: {
+        normal: "Tienes diferenciación. Falta dominancia.",
+        generalista: "Tu sistema existe, pero compite con otras promesas en tu perfil."
+    },
+    4: {
+        normal: "Eres la opción obvia. Hora de sistematizar y escalar.",
+        generalista: "Nivel 4 alcanzado, pero hay ruido residual que reduce tu autoridad."
+    }
+};
+
+function getPersonalizedQuote(level, hasGeneralista) {
+    const quotes = LEVEL_QUOTES[level];
+    return hasGeneralista ? quotes.generalista : quotes.normal;
+}
+
+// ============================================================
+// RADAR CHART GENERATOR
+// ============================================================
+
+function generateRadarChart(scores) {
+    const dimensions = [
+        { key: 'PV', label: '👤 Propuesta de Valor', icon: '👤', value: scores.PV || 0 },
+        { key: 'CL', label: '🎯 Claridad de Nicho', icon: '🎯', value: scores.CL || 0 },
+        { key: 'AF', label: 'in Autoridad y Framework', icon: 'linkedin', value: scores.AF || 0 },
+        { key: 'AC', label: '📝 Actividad Consistente', icon: '📝', value: scores.AC || 0 },
+        { key: 'CV', label: '💬 Conversión Visible', icon: '💬', value: scores.CV || 0 }
+    ];
+
+    const size = 400;
+    const center = size / 2;
+    const maxRadius = 160;
+    const levels = 5;
+
+    const angleStep = (Math.PI * 2) / dimensions.length;
+    const startAngle = -Math.PI / 2;
+
+    const points = dimensions.map((dim, i) => {
+        const angle = startAngle + angleStep * i;
+        const radius = (dim.value / 100) * maxRadius;
+        return {
+            x: center + Math.cos(angle) * radius,
+            y: center + Math.sin(angle) * radius
+        };
+    });
+
+    const pathData = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x},${p.y}`).join(' ') + ' Z';
+
+    let levelCircles = '';
+    for (let i = 1; i <= levels; i++) {
+        const r = (maxRadius / levels) * i;
+        levelCircles += `<circle cx="${center}" cy="${center}" r="${r}" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>`;
+    }
+
+    let radialLines = '';
+    dimensions.forEach((_, i) => {
+        const angle = startAngle + angleStep * i;
+        const endX = center + Math.cos(angle) * maxRadius;
+        const endY = center + Math.sin(angle) * maxRadius;
+        radialLines += `<line x1="${center}" y1="${center}" x2="${endX}" y2="${endY}" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>`;
+    });
+
+    return `
+        <svg class="radar-canvas" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
+            ${levelCircles}
+            ${radialLines}
+            <path d="${pathData}" fill="rgba(0,212,255,0.15)" stroke="#00d4ff" stroke-width="2"/>
+            ${points.map(p => `<circle cx="${p.x}" cy="${p.y}" r="4" fill="#00d4ff"/>`).join('')}
+        </svg>
+    `;
+}
+
+function renderRadarLegend(scores) {
+    const dimensions = [
+        { icon: '👤', label: 'Propuesta de Valor', value: scores.PV || 0 },
+        { icon: '🎯', label: 'Claridad de Nicho', value: scores.CL || 0 },
+        { icon: 'linkedin', label: 'Autoridad y Framework', value: scores.AF || 0 },
+        { icon: '📝', label: 'Actividad Consistente', value: scores.AC || 0 },
+        { icon: '💬', label: 'Conversión Visible', value: scores.CV || 0 }
+    ];
+
+    return dimensions.map(dim => {
+        const iconHtml = dim.icon === 'linkedin' 
+            ? `<svg class="radar-legend-icon" width="16" height="16" viewBox="0 0 24 24" fill="#0A66C2" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+              </svg>`
+            : `<span class="radar-legend-icon">${dim.icon}</span>`;
+        
+        return `
+            <div class="radar-legend-item">
+                ${iconHtml}
+                <span class="radar-legend-label">${dim.label}</span>
+                <span class="radar-legend-value">${Math.round(dim.value)}/100</span>
+            </div>
+        `;
+    }).join('');
+}
+
 const LEAD_CONTENT = {
     1: {
         urgency:   'Tu perfil está en modo invisible.',
@@ -2384,6 +2744,7 @@ function renderLeadCapture() {
             </div>
 
             <div class="lc-trust">
+                <span>✓ Respuesta en menos de 1 hora</span>
                 <span>·</span>
                 <span>✓ Análisis personalizado incluido</span>
             </div>
