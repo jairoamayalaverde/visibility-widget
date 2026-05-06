@@ -309,8 +309,16 @@
         .sbc-potential { color: var(--cyan); }
         .sbc-meta-label { font-family: var(--font-mono); font-size: 10px; color: var(--muted2); letter-spacing: 1px; white-space: nowrap; }
         .sbc-meta-divider { width: 1px; height: 32px; background: var(--border); }
-        .sbc-meta-profile { padding-left: 20px; align-items: flex-start; }
-        .sbc-meta-url { font-family: var(--font-mono); font-size: 11px; color: var(--muted); margin-top: 2px; }
+        .sbc-meta-profile { padding-left: 20px; align-items: flex-start; max-width: 100%; }
+        .sbc-meta-url { 
+            font-family: var(--font-mono); 
+            font-size: 11px; 
+            color: var(--muted); 
+            margin-top: 2px; 
+            word-break: break-all;
+            overflow-wrap: break-word;
+            max-width: 100%;
+        }
 
         /* ── TRIGGER ALERT ────────────────────────────── */
         .trigger-alert {
@@ -655,6 +663,9 @@
             border: 1px solid var(--border);
             border-radius: 6px;
             display: inline-block;
+            word-break: break-all;
+            overflow-wrap: break-word;
+            max-width: 100%;
         }
 
         .onboarding-steps {
@@ -1160,9 +1171,15 @@
             color: var(--muted2);
             text-align: center;
             font-family: var(--font-mono);
+            word-break: break-all;
+            overflow-wrap: break-word;
+            padding: 0 10px;
         }
 
-        .quiz-profile-ref span { color: var(--muted); }
+        .quiz-profile-ref span { 
+            color: var(--muted); 
+            word-break: break-all;
+        }
 
         /* ── ANALYZING ─────────────────────────────────── */
         .loading-state {
@@ -1198,6 +1215,9 @@
             font-size: 15px;
             color: var(--cyan);
             margin-bottom: 32px;
+            word-break: break-all;
+            overflow-wrap: break-word;
+            padding: 0 20px;
         }
 
         .loading-steps {
@@ -1713,6 +1733,376 @@
         }
 
         .retry-btn:hover { background: rgba(244,63,94,0.1); }
+
+        /* ══════════════════════════════════════════════════ */
+        /* MOBILE OPTIMIZATIONS                               */
+        /* ══════════════════════════════════════════════════ */
+
+        @media (max-width: 768px) {
+            
+            /* ── A) ESPACIADO GENERAL ─────────────────────── */
+            
+            body {
+                padding: 0 16px 40px;
+            }
+
+            .hero-section {
+                padding: 60px 0 40px;
+            }
+
+            .hero-section h1 {
+                font-size: clamp(36px, 10vw, 54px);
+                margin-bottom: 20px;
+            }
+
+            .hero-section p {
+                font-size: 14px;
+                margin-bottom: 28px;
+            }
+
+            .hero-formula {
+                font-size: 11px;
+                padding: 8px 16px;
+            }
+
+            /* Cards con menos padding */
+            .input-box,
+            .onboarding-screen,
+            .instructions-screen,
+            .quiz-container,
+            .loading-state,
+            .score-breakdown-card,
+            .radar-container,
+            .gap-section,
+            .interventions-section,
+            .lead-capture {
+                padding: 24px 20px;
+                border-radius: 12px;
+            }
+
+            .success-message,
+            .error-message {
+                padding: 36px 24px;
+            }
+
+            /* Reducir espacios entre secciones */
+            .score-breakdown-card,
+            .personalized-quote,
+            .radar-container,
+            .trigger-alert,
+            .gap-section,
+            .interventions-section,
+            .lead-capture {
+                margin-bottom: 16px;
+            }
+
+            .niche-badge {
+                font-size: 12px;
+                padding: 6px 16px;
+                margin-bottom: 16px;
+            }
+
+            .personalized-quote {
+                font-size: 14px;
+                padding: 16px 20px;
+            }
+
+            /* Meta section más compacta */
+            .sbc-meta {
+                padding: 12px 16px;
+                gap: 8px;
+            }
+
+            .sbc-meta-item {
+                padding: 0 12px;
+            }
+
+            .sbc-meta-item:first-child {
+                padding-left: 0;
+            }
+
+            .sbc-meta-val {
+                font-size: 18px;
+            }
+
+            .sbc-meta-label {
+                font-size: 9px;
+            }
+
+            /* ── B) RADAR CHART RESPONSIVE ────────────────── */
+            
+            .radar-canvas-wrapper {
+                max-width: 320px;
+                margin-bottom: 20px;
+            }
+
+            .radar-legend {
+                grid-template-columns: 1fr;
+                gap: 8px;
+                max-width: 100%;
+            }
+
+            .radar-legend-item {
+                font-size: 11px;
+            }
+
+            .radar-legend-value {
+                font-size: 10px;
+            }
+
+            /* ── C) BOTONES Y CTAS ────────────────────────── */
+            
+            /* Tap targets mínimo 44px */
+            .analyze-btn,
+            .answer-continue,
+            .inst-start-btn,
+            .submit-btn,
+            .lc-whatsapp-btn {
+                min-height: 48px;
+                padding: 14px 24px;
+                font-size: 15px;
+            }
+
+            .answer-btn {
+                min-height: 80px;
+                padding: 20px 16px;
+            }
+
+            /* Quiz buttons con más espacio */
+            .quiz-answers {
+                gap: 12px;
+            }
+
+            /* Instructions demo buttons */
+            .inst-demo-btn {
+                min-height: 72px;
+                padding: 16px;
+                font-size: 14px;
+            }
+
+            /* WhatsApp button más prominente */
+            .lc-whatsapp-btn {
+                padding: 16px 28px;
+                font-size: 16px;
+            }
+
+            .lc-wa-icon {
+                font-size: 22px;
+            }
+
+            /* Intervention items más compactos */
+            .intervention-item {
+                padding: 16px;
+                gap: 12px;
+            }
+
+            .intervention-num {
+                font-size: 18px;
+                width: 28px;
+            }
+
+            .intervention-label {
+                font-size: 14px;
+            }
+
+            .intervention-action {
+                font-size: 12px;
+            }
+
+            /* Gap items más pequeños */
+            .gap-item {
+                gap: 10px;
+            }
+
+            .gap-label {
+                font-size: 13px;
+            }
+
+            .gap-action {
+                font-size: 11px;
+            }
+
+            /* Trigger alerts */
+            .trigger-alert {
+                padding: 16px 20px;
+            }
+
+            .trigger-message {
+                font-size: 13px;
+            }
+
+            /* Trust row más compacto */
+            .trust-row {
+                font-size: 10px;
+                gap: 8px;
+            }
+
+            /* Loading steps más pequeño */
+            .loading-steps {
+                font-size: 12px;
+                max-width: 280px;
+            }
+
+            /* Quiz meta más compacta */
+            .quiz-meta {
+                gap: 8px;
+                margin-bottom: 20px;
+            }
+
+            .dimension-badge {
+                font-size: 9px;
+                padding: 3px 8px;
+            }
+
+            .pillar-label {
+                font-size: 10px;
+            }
+
+            /* Question más compacta */
+            .quiz-question h2 {
+                font-size: clamp(18px, 5vw, 22px);
+                margin-bottom: 8px;
+            }
+
+            .question-detail {
+                font-size: 13px;
+            }
+
+            .question-hint {
+                font-size: 12px;
+                padding: 8px 12px;
+            }
+
+            /* Onboarding más compacto */
+            .onboarding-check {
+                width: 48px;
+                height: 48px;
+                font-size: 24px;
+                margin-bottom: 16px;
+            }
+
+            .onboarding-url {
+                font-size: 12px;
+                padding: 8px 12px;
+                margin-bottom: 24px;
+            }
+
+            .ob-step {
+                font-size: 13px;
+            }
+
+            .onboarding-explainer {
+                padding: 16px 20px;
+            }
+
+            .onboarding-explainer p {
+                font-size: 13px;
+            }
+
+            /* Instructions más compactas */
+            .inst-title {
+                font-size: 22px;
+            }
+
+            .inst-subtitle {
+                font-size: 14px;
+            }
+
+            .inst-check-item {
+                font-size: 13px;
+            }
+
+            .inst-example-text {
+                font-size: 12px;
+            }
+
+            /* Lead capture más compacto */
+            .lc-headline {
+                font-size: clamp(20px, 5vw, 26px);
+            }
+
+            .lc-sub {
+                font-size: 14px;
+            }
+
+            .lc-preview {
+                padding: 20px;
+                gap: 16px;
+            }
+
+            .lc-preview-num {
+                font-size: 42px;
+            }
+
+            .lc-item {
+                font-size: 12px;
+            }
+
+            .lc-cta-intro {
+                font-size: 14px;
+                margin-bottom: 20px;
+            }
+
+            /* Success/Error más compactos */
+            .success-icon {
+                width: 48px;
+                height: 48px;
+                font-size: 20px;
+                margin-bottom: 16px;
+            }
+
+            .success-message h2 {
+                font-size: 22px;
+            }
+
+            .success-message p {
+                font-size: 14px;
+            }
+
+            .success-next {
+                padding: 16px;
+                margin-top: 24px;
+            }
+
+            .success-next-level {
+                font-size: 16px;
+            }
+
+            .success-next-desc {
+                font-size: 12px;
+            }
+        }
+
+        /* Ajustes extra para pantallas muy pequeñas (<400px) */
+        @media (max-width: 400px) {
+            
+            .hero-section h1 {
+                font-size: 32px;
+            }
+
+            .hero-formula {
+                font-size: 10px;
+                padding: 6px 12px;
+            }
+
+            .radar-canvas-wrapper {
+                max-width: 280px;
+            }
+
+            .sbc-vs-number {
+                font-size: 64px;
+            }
+
+            .cdc-score {
+                font-size: 28px;
+            }
+
+            .analyze-btn,
+            .answer-continue,
+            .submit-btn {
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body>
